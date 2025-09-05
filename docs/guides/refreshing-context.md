@@ -12,13 +12,15 @@ When your context window is getting full or you need to hand off to a future ses
 ## How to Create a Context Refresh
 
 1. Run: `holo context-new "Brief description of current state"`
-2. This creates a timestamped file in `_memory/context_refresh/`
-3. Write a comprehensive summary of:
+2. This creates a timestamped file with `_PENDING_` prefix in `_memory/context_refresh/`
+3. Edit the file to add comprehensive details about:
    - What you've accomplished
    - Current state of the project
    - What needs to be done next
    - Any important decisions or discoveries
    - Links to relevant files or resources
+4. **IMPORTANT**: Rename the file to remove the `_PENDING_` prefix to mark it as executed
+   - Example: `_PENDING_2025-09-05_context_refresh.md` → `2025-09-05_context_refresh.md`
 
 ## Example Context Refresh
 
@@ -43,4 +45,14 @@ When your context window is getting full or you need to hand off to a future ses
 
 ## Loading Context
 
+### Manual Loading
 When starting a new session, check for context refresh files in `_memory/context_refresh/` and read the most recent one to get up to speed.
+
+### Automated Loading
+Use `holo onboard` to automatically:
+- Display the framework guide
+- Process any pending context refreshes (files with `_PENDING_` prefix)
+- Rename pending files to mark them as executed
+- Display the content of processed refreshes
+
+This ensures you never miss a context refresh and automates the file management workflow.

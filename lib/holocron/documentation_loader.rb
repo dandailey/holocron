@@ -16,6 +16,14 @@ module Holocron
       load_documentation('guides/creating-long-form-docs.md')
     end
 
+    def self.offboarding_guide
+      load_documentation('guides/offboarding.md')
+    end
+
+    def self.progress_logging_guide
+      load_documentation('guides/progress-logging.md')
+    end
+
     private
 
     def self.load_documentation(relative_path)

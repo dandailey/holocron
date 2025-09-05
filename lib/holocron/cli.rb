@@ -10,6 +10,8 @@ require 'holocron/commands/suggest'
 require 'holocron/commands/contribute'
 require 'holocron/commands/framework'
 require 'holocron/commands/guide'
+require 'holocron/commands/onboard'
+require 'holocron/commands/progress'
 
 module Holocron
   class CLI < Thor
@@ -38,6 +40,10 @@ module Holocron
 
     desc 'context-new [REASON]', 'Create a new context refresh file'
     option :why, type: :string, desc: 'Reason for context refresh'
+    option :slug, type: :string, desc: 'Custom filename slug (default: context_refresh)'
+    option :name, type: :string, desc: 'Alias for --slug'
+    option :content, type: :string, desc: 'Full detailed content (if not provided, creates template for manual editing)'
+    option :full_content, type: :string, desc: 'Alias for --content'
     def context_new(reason = nil)
       Commands::Context.new(reason, options).new_refresh
     end
@@ -61,6 +67,20 @@ module Holocron
     desc 'guide [GUIDE_NAME]', 'Display a specific Holocron guide'
     def guide(guide_name = nil)
       Commands::Guide.new(guide_name, options).call
+    end
+
+    desc 'onboard', 'Display framework guide and process pending context refreshes'
+    def onboard
+      Commands::Onboard.new(options).call
+    end
+
+    desc 'progress SUMMARY', 'Add a progress log entry'
+    option :slug, type: :string, desc: 'Custom filename slug (default: progress_update)'
+    option :name, type: :string, desc: 'Alias for --slug'
+    option :content, type: :string, desc: 'Full detailed content (default: uses SUMMARY)'
+    option :full_content, type: :string, desc: 'Alias for --content'
+    def progress(summary)
+      Commands::Progress.new(summary, options).add_entry
     end
 
     def self.exit_on_failure?
