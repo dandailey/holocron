@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "fileutils"
-require "colorize"
+require 'fileutils'
+require 'colorize'
 
 module Holocron
   class TemplateManager
@@ -11,9 +11,8 @@ module Holocron
 
     def copy_templates
       copy_readme
-      copy_shared_guides
       copy_standard_files
-      puts "Templates copied successfully".colorize(:green)
+      puts 'Templates copied successfully'.colorize(:green)
     end
 
     private
@@ -22,7 +21,7 @@ module Holocron
       readme_content = <<~README
         # Your Holocron Bootup Instructions
 
-        FIRST THING'S FIRST: if you haven't already, read the [Master Holocron README](https://github.com/dandailey/holocron/blob/main/README.md) and follow any instructions it contains. Go do that now.
+        FIRST THING'S FIRST: if you haven't already, run `holo framework` to understand the Holocron framework and follow any instructions it contains. Go do that now.
 
         ## Quick Access
         - **Canonical env/setup**: [\`_memory/env_setup.md\`](_memory/env_setup.md)
@@ -64,34 +63,23 @@ module Holocron
         Remember: this is YOUR memory. Write what future-you needs to know!
       README
 
-      File.write(File.join(@target_directory, "README.md"), readme_content)
-    end
-
-    def copy_shared_guides
-      guides_dir = File.join(@target_directory, "shared_guides")
-      FileUtils.mkdir_p(guides_dir)
-
-      # Copy the shared guides from the master Holocron
-      master_guides_dir = "/Users/daniel/Library/CloudStorage/Dropbox/Application Data/Obsidian/Personal/Holocron/shared_guides"
-      if Dir.exist?(master_guides_dir)
-        Dir.glob(File.join(master_guides_dir, "*.md")).each do |file|
-          FileUtils.cp(file, File.join(guides_dir, File.basename(file)))
-        end
-      else
-        # Create placeholder guides if master doesn't exist
-        create_placeholder_guide(guides_dir, "refreshing_context.md")
-        create_placeholder_guide(guides_dir, "creating_long_form_docs.md")
-      end
+      File.write(File.join(@target_directory, 'README.md'), readme_content)
     end
 
     def copy_standard_files
-      create_placeholder_file("action_plan.md", "Action Plan", "Step-by-step project plan with phases, tasks, and completion checkboxes")
-      create_placeholder_file("project_overview.md", "Project Overview", "Big picture overview of the project with goals and approach")
-      create_placeholder_file("progress_log.md", "Progress Log", "High-level summary of work completed with references to detailed logs")
-      create_placeholder_file("todo.md", "Todo", "Overflow tasks and scope creep items that need attention")
-      create_placeholder_file("_memory/decision_log.md", "Decision Log", "Log of major architectural and technical decisions with dates and reasoning")
-      create_placeholder_file("_memory/env_setup.md", "Environment Setup", "Development environment, tech stack, and database setup details")
-      create_placeholder_file("_memory/test_list.md", "Test List", "List of all tests written with file paths and coverage notes")
+      create_placeholder_file('action_plan.md', 'Action Plan',
+                              'Step-by-step project plan with phases, tasks, and completion checkboxes')
+      create_placeholder_file('project_overview.md', 'Project Overview',
+                              'Big picture overview of the project with goals and approach')
+      create_placeholder_file('progress_log.md', 'Progress Log',
+                              'High-level summary of work completed with references to detailed logs')
+      create_placeholder_file('todo.md', 'Todo', 'Overflow tasks and scope creep items that need attention')
+      create_placeholder_file('_memory/decision_log.md', 'Decision Log',
+                              'Log of major architectural and technical decisions with dates and reasoning')
+      create_placeholder_file('_memory/env_setup.md', 'Environment Setup',
+                              'Development environment, tech stack, and database setup details')
+      create_placeholder_file('_memory/test_list.md', 'Test List',
+                              'List of all tests written with file paths and coverage notes')
     end
 
     def create_placeholder_file(filename, title, description)
@@ -106,16 +94,6 @@ module Holocron
       filepath = File.join(@target_directory, filename)
       FileUtils.mkdir_p(File.dirname(filepath))
       File.write(filepath, content)
-    end
-
-    def create_placeholder_guide(guides_dir, filename)
-      content = <<~CONTENT
-        # #{filename.gsub('_', ' ').gsub('.md', '').split.map(&:capitalize).join(' ')}
-
-        This is a placeholder guide. The actual content should be copied from the master Holocron repository.
-      CONTENT
-
-      File.write(File.join(guides_dir, filename), content)
     end
   end
 end

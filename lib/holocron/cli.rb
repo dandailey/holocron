@@ -8,6 +8,8 @@ require 'holocron/commands/longform'
 require 'holocron/commands/context'
 require 'holocron/commands/suggest'
 require 'holocron/commands/contribute'
+require 'holocron/commands/framework'
+require 'holocron/commands/guide'
 
 module Holocron
   class CLI < Thor
@@ -49,6 +51,16 @@ module Holocron
     desc 'contribute', 'Initialize a working Holocron for contributing to this project'
     def contribute
       Commands::Contribute.new.call
+    end
+
+    desc 'framework', 'Display the Holocron framework guide'
+    def framework
+      Commands::Framework.new.call
+    end
+
+    desc 'guide [GUIDE_NAME]', 'Display a specific Holocron guide'
+    def guide(guide_name = nil)
+      Commands::Guide.new(guide_name, options).call
     end
 
     def self.exit_on_failure?
