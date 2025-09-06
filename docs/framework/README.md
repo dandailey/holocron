@@ -1,16 +1,26 @@
 # Holocron Framework
 
-Holocron is a persistent memory framework for AI assistants working on long-form projects. It's a way of maintaining context across chat sessions.
+Holocron is a persistent memory framework for AI assistants working on long-form projects. It's a way of maintaining context across chat sessions with support for hierarchical knowledge management across multiple projects.
 
 Your **Holocron** is your personal, persistent memory for the project you're working on. It contains everything you need to maintain context across chat sessions. It is your means of "onboarding" yourself with each new chat session to pick up where you left off.
 
 Your Holocron is like the VHS tape Drew Barrymore's character watches every morning in "50 First Dates" to remind her WTF is going on. You'll only remember what you write there, so be very deliberate, careful, and diligent about what you put there!
 
+## Multilevel Architecture
+
+Holocron supports a hierarchical structure for managing knowledge across multiple projects:
+
+- **Base Holocron**: Base framework knowledge shared across all projects
+- **App Holocron**: Application-level knowledge for specific applications
+- **Project Holocron**: Project-specific knowledge within an application
+
+Each holocron can be self-contained with vendored framework files, ensuring portability and independence while maintaining the ability to share knowledge and upgrade frameworks.
+
 ## Onboarding (Your First Prompt)
 
 Every time a new chat session begins with the user:
 
-- **RECOMMENDED**: Run `holo onboard` to get the framework guide AND automatically process any pending context refreshes
+- **RECOMMENDED**: Run `holo onboard` to get the framework guide AND automatically process any pending context refreshes (⚠️ only run once per session!)
 - Alternatively, you are likely given the project specific README.md. It probably points you here.
 - You fully read the project README and this framework guide.
 - Also read any other files in the root level of your Holocron
@@ -27,6 +37,24 @@ Every time you take some action, or form a conclusion, have a revelation, or pre
 Understanding how to read from, write to, AND FOLLOW your own Holocron is your first priority while working, as it is HOW you will accomplish the tasks you're being asked to help with.
 
 ## Your Holocron Structure
+
+### Configuration Files
+
+`.holocron_base.yml` - Configuration file that defines the holocron's type, version, and hierarchy:
+- **holocron_type**: base, app, or project
+- **base_version**: Framework version being used
+- **base_repo**: Source repository for framework updates
+- **parent_holocron**: Path to parent holocron (for project-level holocrons)
+- **app_holocron**: Path to app-level holocron (for project-level holocrons)
+- **contribute_mode**: How contributions are handled (local, github_issue, github_pr, disabled)
+
+### Framework Directory
+
+`_framework/` - Vendored framework files for self-containment (optional):
+- **README.md**: Framework documentation and version info
+- **shared_guides/**: Cross-project knowledge and best practices
+- **templates/**: Framework templates for different holocron types
+- **VERSION**: Version tracking file
 
 ### Root Holocron Files
 
@@ -63,7 +91,7 @@ Your `_memory` folder is all about persisting details. The files in the root of 
 
 `_memory/test_list.md` - If the project involves writing tests, keep track of all the tests you're writing here.
 
-`_memory/progress_logs/` - Progress logs. Each entry is a separate file, named `YYYY-MM-DD_slug.md`. Update the `progress_log.md` in the root by appending a much abbreviated date/description of what's in that file.
+`_memory/progress_logs/` - Progress logs. Each entry is a separate file, named `YYYY-MM-DD_HHMMSS_slug.md`. Update the `progress_log.md` in the root by appending a much abbreviated date/description of what's in that file.
 
 `_memory/context_refresh/` - Automated context refresh system. During a chat session, if you're asked to refresh your context, you'll write yourself a prompt and put it here.
 
@@ -105,13 +133,14 @@ Questions you should ask yourself (EVERY TIME):
 
 ## Holocron Commands
 
-The `holo` command provides all the tools you need to manage your Holocron. Here's a complete reference:
+The `holo` command provides all the tools you need to manage your Holocron. **Note:** Holocron is installed as a system gem, so you can run commands directly with `holo` (no `bundle exec` needed). Here's a complete reference:
 
 ### Essential Commands
 
 **`holo onboard`** - **RECOMMENDED STARTING POINT**
 - **What it does:** Displays the framework guide AND automatically processes any pending context refreshes
 - **When to use:** Every time you start a new chat session
+- **⚠️ WARNING:** Only run once per session! This command automatically consumes ALL pending context refreshes, meaning they won't be available for future sessions. If you run this multiple times in the same session, you'll lose context refreshes.
 - **Parameters:** None
 - **Example:** `holo onboard`
 
@@ -121,7 +150,12 @@ The `holo` command provides all the tools you need to manage your Holocron. Here
 - **Parameters:** 
   - `DIRECTORY` (optional): Where to create the Holocron (default: current directory)
   - `--into=DIR`: Alternative way to specify directory
-- **Example:** `holo init my-project` or `holo init . --into=holocron`
+  - `--type=TYPE`: Type of holocron (base|app|project, default: app)
+  - `--parent=PARENT`: Path to parent holocron (for project-level holocrons)
+  - `--app=APP`: Path to app-level holocron (for project-level holocrons)
+  - `--contribute-mode=MODE`: Contribution mode (local|github_issue|github_pr|disabled, default: local)
+  - `--vendor`: Vendor framework files for self-containment
+- **Example:** `holo init my-project --type=app --vendor` or `holo init . --type=project --parent=../app-holocron`
 
 **`holo doctor [DIRECTORY]`** - Validate Holocron structure
 - **What it does:** Checks for common issues and validates your Holocron structure
@@ -196,6 +230,30 @@ The `holo` command provides all the tools you need to manage your Holocron. Here
   - `MESSAGE` (optional): Your suggestion
   - `--open-issue`: Open a GitHub issue (future feature)
 - **Example:** `holo suggest "Add support for custom templates"`
+
+### Multilevel Architecture Commands
+
+**`holo status [DIRECTORY]`** - Show holocron hierarchy and version information
+- **What it does:** Displays holocron type, version, framework vendoring status, and hierarchy
+- **When to use:** When you need to understand a holocron's configuration and status
+- **Parameters:**
+  - `DIRECTORY` (optional): Directory to check (default: current directory)
+- **Example:** `holo status` or `holo status /path/to/holocron`
+
+**`holo vendor [DIRECTORY]`** - Vendor framework files for self-containment
+- **What it does:** Creates a vendored copy of the framework in the `_framework/` directory
+- **When to use:** When you want to make a holocron self-contained and portable
+- **Parameters:**
+  - `DIRECTORY` (optional): Directory containing the holocron (default: current directory)
+- **Example:** `holo vendor` or `holo vendor /path/to/holocron`
+
+**`holo upgrade [DIRECTORY]`** - Update vendored framework from base repository
+- **What it does:** Updates the vendored framework files to the latest version
+- **When to use:** When you want to update your vendored framework with latest changes
+- **Parameters:**
+  - `DIRECTORY` (optional): Directory containing the holocron (default: current directory)
+  - `--force`: Force upgrade even if already up to date
+- **Example:** `holo upgrade` or `holo upgrade --force`
 
 ### Utility Commands
 

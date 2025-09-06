@@ -5,22 +5,22 @@ require 'colorize'
 
 module Holocron
   module Commands
-    class Context
+    class Context < BaseCommand
       def initialize(reason, options)
+        super(options)
         @reason = reason || options[:why] || 'Manual context refresh'
         @slug = options[:slug] || options[:name]
         @content = options[:content] || options[:full_content]
-        @options = options
       end
 
       def new_refresh
-        timestamp = Time.now.strftime('%Y_%m_%d')
+        require_holocron_directory!
+
+        timestamp = Time.now.strftime('%Y_%m_%d_%H%M%S')
         slug = @slug ? @slug.gsub(/[^a-zA-Z0-9_-]/, '_') : 'context_refresh'
         filename = "_PENDING_#{timestamp}_#{slug}.md"
 
-        # Try to find the correct Holocron directory
-        holocron_dir = find_holocron_directory
-        filepath = File.join(holocron_dir, '_memory', 'context_refresh', filename)
+        filepath = File.join(@holocron_directory, '_memory', 'context_refresh', filename)
 
         if @content
           # Use provided content directly
@@ -76,20 +76,6 @@ module Holocron
       end
 
       private
-
-      def find_holocron_directory
-        # Look for .holocron directory in current directory or parent directories
-        current_dir = Dir.pwd
-        while current_dir != File.dirname(current_dir)
-          holocron_path = File.join(current_dir, '.holocron')
-          return File.join(holocron_path, 'sync') if Dir.exist?(holocron_path)
-
-          current_dir = File.dirname(current_dir)
-        end
-
-        # Fallback to current directory if no .holocron found
-        '.'
-      end
     end
   end
 end

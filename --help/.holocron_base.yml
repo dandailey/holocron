@@ -1,0 +1,11 @@
+---
+base_repo: https://github.com/dandailey/holocron
+base_version: 0.1.0
+base_commit:
+local_base_path:
+contribute_mode: local
+holocron_type: app
+parent_holocron:
+app_holocron:
+auto_upgrade: false
+upgrade_notifications: true

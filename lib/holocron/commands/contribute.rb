@@ -7,6 +7,10 @@ require 'holocron/template_manager'
 module Holocron
   module Commands
     class Contribute
+      def initialize(options = {})
+        @options = options
+      end
+
       def call
         unless in_holocron_project?
           puts '❌ This command must be run from a Holocron project directory'.colorize(:red)
@@ -18,10 +22,13 @@ module Holocron
         puts '🚀 Initializing contributor working memory...'.colorize(:blue)
 
         if Dir.exist?('.holocron')
-          puts '⚠️  .holocron directory already exists'.colorize(:yellow)
-          puts 'This will overwrite your existing working memory. Continue? (y/N)'
-          response = STDIN.gets.chomp.downcase
-          return unless response == 'y'
+          unless @options[:force]
+            puts '⚠️  .holocron directory already exists'.colorize(:yellow)
+            puts 'This will overwrite your existing working memory.'
+            puts 'Use --force to proceed with overwriting'
+            return
+          end
+          puts '⚠️  Overwriting existing .holocron directory...'.colorize(:yellow)
         end
 
         create_directory_structure
@@ -93,7 +100,7 @@ module Holocron
 
           ### Common Commands
           ```bash
-          # Test the gem
+          # Test the gem (when developing)
           bundle exec exe/holo version
           bundle exec exe/holo init test-project
           bundle exec exe/holo doctor test-project
@@ -106,6 +113,11 @@ module Holocron
 
           # Install locally
           gem install ./holocron-0.1.0.gem
+
+          # Once installed, use directly (no bundle exec needed)
+          holo version
+          holo init test-project
+          holo doctor test-project
           ```
 
           ### Working Memory Usage

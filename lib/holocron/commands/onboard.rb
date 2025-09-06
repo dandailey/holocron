@@ -2,18 +2,24 @@
 
 require 'fileutils'
 require 'colorize'
+require 'holocron/config_manager'
+require 'holocron/holocron_finder'
 
 module Holocron
   module Commands
-    class Onboard
+    class Onboard < BaseCommand
       def initialize(options = {})
-        @options = options
+        super(options)
+        @config_manager = ConfigManager.new('.')
       end
 
       def call
         puts '🚀 Holocron Onboarding'.colorize(:cyan)
         puts '=' * 50
         puts
+
+        # Check if we can find a holocron directory
+        require_holocron_directory!
 
         # Display the framework guide
         display_framework
@@ -39,7 +45,9 @@ module Holocron
       end
 
       def process_pending_refreshes
-        context_refresh_dir = File.join('_memory', 'context_refresh')
+        return unless @holocron_directory
+
+        context_refresh_dir = File.join(@holocron_directory, '_memory', 'context_refresh')
         return unless Dir.exist?(context_refresh_dir)
 
         pending_files = Dir.glob(File.join(context_refresh_dir, '_PENDING_*.md'))

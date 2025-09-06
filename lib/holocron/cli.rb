@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'thor'
+require 'holocron/commands/base_command'
 require 'holocron/commands/init'
 require 'holocron/commands/doctor'
 require 'holocron/commands/version'
@@ -12,11 +13,23 @@ require 'holocron/commands/framework'
 require 'holocron/commands/guide'
 require 'holocron/commands/onboard'
 require 'holocron/commands/progress'
+require 'holocron/commands/status'
+require 'holocron/commands/upgrade'
+require 'holocron/commands/vendor'
+require 'holocron/holocron_finder'
 
 module Holocron
   class CLI < Thor
+    # Global options available to all commands
+    class_option :dir, type: :string, desc: 'Holocron directory (auto-discovered if not specified)'
     desc 'init [DIRECTORY]', 'Initialize a new Holocron in the specified directory'
     option :into, type: :string, default: 'holocron', desc: 'Directory to create the Holocron in'
+    option :type, type: :string, default: 'app', desc: 'Type of holocron to create (base|app|project)'
+    option :parent, type: :string, desc: 'Path to parent holocron (for project-level holocrons)'
+    option :app, type: :string, desc: 'Path to app-level holocron (for project-level holocrons)'
+    option :contribute_mode, type: :string, default: 'local',
+                             desc: 'Contribution mode (local|github_issue|github_pr|disabled)'
+    option :vendor, type: :boolean, default: false, desc: 'Vendor framework files for self-containment'
     def init(directory = nil)
       Commands::Init.new(directory, options).call
     end
@@ -55,8 +68,9 @@ module Holocron
     end
 
     desc 'contribute', 'Initialize a working Holocron for contributing to this project'
+    option :force, type: :boolean, default: false, desc: 'Force overwrite existing .holocron directory'
     def contribute
-      Commands::Contribute.new.call
+      Commands::Contribute.new(options).call
     end
 
     desc 'framework', 'Display the Holocron framework guide'
@@ -83,8 +97,30 @@ module Holocron
       Commands::Progress.new(summary, options).add_entry
     end
 
+    desc 'status [DIRECTORY]', 'Show holocron hierarchy and version information'
+    def status(directory = '.')
+      Commands::Status.new(directory, options).call
+    end
+
+    desc 'upgrade [DIRECTORY]', 'Update vendored framework from base repository'
+    option :force, type: :boolean, default: false, desc: 'Force upgrade even if already up to date'
+    def upgrade(directory = '.')
+      Commands::Upgrade.new(directory, options).call
+    end
+
+    desc 'vendor [DIRECTORY]', 'Vendor framework files for self-containment'
+    def vendor(directory = '.')
+      Commands::Vendor.new(directory, options).call
+    end
+
     def self.exit_on_failure?
       true
+    end
+
+    private
+
+    def holocron_directory
+      @holocron_directory ||= HolocronFinder.find_holocron_directory('.', options[:dir])
     end
   end
 end

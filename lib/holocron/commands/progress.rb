@@ -5,21 +5,21 @@ require 'colorize'
 
 module Holocron
   module Commands
-    class Progress
+    class Progress < BaseCommand
       def initialize(summary, options)
+        super(options)
         @summary = summary
         @slug = options[:slug] || options[:name] || 'progress_update'
         @content = options[:content] || options[:full_content] || summary
-        @options = options
       end
 
       def add_entry
-        timestamp = Time.now.strftime('%Y-%m-%d')
+        require_holocron_directory!
+
+        timestamp = Time.now.strftime('%Y-%m-%d_%H%M%S')
         filename = "#{timestamp}_#{@slug}.md"
 
-        # Try to find the correct Holocron directory
-        holocron_dir = find_holocron_directory
-        filepath = File.join(holocron_dir, '_memory', 'progress_logs', filename)
+        filepath = File.join(@holocron_directory, '_memory', 'progress_logs', filename)
 
         # Create the detailed progress log entry
         detailed_content = <<~CONTENT
@@ -43,27 +43,13 @@ module Holocron
         File.write(filepath, detailed_content)
 
         # Update the main progress log
-        update_main_progress_log(holocron_dir, timestamp, @summary, filename)
+        update_main_progress_log(@holocron_directory, timestamp, @summary, filename)
 
         puts "✅ Created progress log entry: #{filepath}".colorize(:green)
         puts '📝 Updated main progress log with summary'.colorize(:green)
       end
 
       private
-
-      def find_holocron_directory
-        # Look for .holocron directory in current directory or parent directories
-        current_dir = Dir.pwd
-        while current_dir != File.dirname(current_dir)
-          holocron_path = File.join(current_dir, '.holocron')
-          return File.join(holocron_path, 'sync') if Dir.exist?(holocron_path)
-
-          current_dir = File.dirname(current_dir)
-        end
-
-        # Fallback to current directory if no .holocron found
-        '.'
-      end
 
       def update_main_progress_log(holocron_dir, timestamp, summary, filename)
         main_log_path = File.join(holocron_dir, 'progress_log.md')
@@ -74,9 +60,9 @@ module Holocron
         # Add new entry to the summary - make it verbose and detailed
         new_entry = <<~ENTRY
           ## #{timestamp}: #{summary}
-          
+
           #{@content}
-          
+
           *Detailed log: `_memory/progress_logs/#{filename}`*
         ENTRY
 

@@ -20,7 +20,8 @@ When your context window is getting full or you need to hand off to a future ses
    - Any important decisions or discoveries
    - Links to relevant files or resources
 4. **IMPORTANT**: Rename the file to remove the `_PENDING_` prefix to mark it as executed
-   - Example: `_PENDING_2025-09-05_context_refresh.md` → `2025-09-05_context_refresh.md`
+   - Example: `_PENDING_2025_09_05_143022_context_refresh.md` → `2025_09_05_143022_context_refresh.md`
+   - **Note**: Timestamps now include time (HHMMSS) to prevent naming conflicts and make chronological order clear
 
 ## Example Context Refresh
 
