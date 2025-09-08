@@ -14,6 +14,11 @@ Document what was accomplished using the progress logging system:
 
 **Command:** `holo progress "Summary" --slug "slug" --content "Full content"`
 
+**The CLI command handles everything automatically:**
+- Creates detailed log file in `_memory/progress_logs/`
+- Updates main `progress_log.md` with verbose summary
+- No manual file editing required
+
 **For detailed instructions:** Run `holo guide progress-logging`
 
 **Quick reference:**
@@ -27,6 +32,11 @@ Document what was accomplished using the progress logging system:
 Create a comprehensive handoff summary using the context refresh system:
 
 **Command:** `holo context-new "Reason" --slug "slug" --content "Full content"`
+
+**The CLI command handles everything automatically:**
+- Creates properly named, timestamped file in `_memory/context_refresh/`
+- No manual editing or file renaming required
+- Ready for immediate use by next session
 
 **For detailed instructions:** Run `holo guide refreshing-context`
 
@@ -86,11 +96,13 @@ Before finishing, verify:
 ```bash
 holo progress "Summary" --slug "slug_name" --content "Full content"
 ```
+**This handles everything automatically** - creates detailed log file and updates main progress log.
 
 ### Context Refresh Command
 ```bash
-holo context-new "Reason" --slug "slug_name"
+holo context-new "Reason" --slug "slug_name" --content "Full content"
 ```
+**This handles everything automatically** - creates properly named file with your content, no manual editing needed.
 
 ### Other Useful Commands
 ```bash

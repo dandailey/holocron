@@ -37,12 +37,13 @@ Holocron is designed as a self-contained Ruby gem that provides a CLI tool for m
                                 │                        │
                                 ▼                        ▼
                        ┌─────────────────┐    ┌─────────────────┐
-                       │  Configuration  │    │  Template Mgmt  │
-                       └─────────────────┘    └─────────────────┘
-                                │                        │
-                                ▼                        ▼
-                       ┌─────────────────┐    ┌─────────────────┐
-                       │   File System   │    │   Validation    │
+                       │  Holocron       │    │  Template Mgmt  │
+                       │  Detection      │    └─────────────────┘
+                       └─────────────────┘             │
+                                │                      ▼
+                                ▼            ┌─────────────────┐
+                       ┌─────────────────┐    │   File System   │
+                       │   Validation    │    │   Operations    │
                        └─────────────────┘    └─────────────────┘
 ```
 
@@ -65,8 +66,14 @@ Individual command implementations:
 - **Doctor** - Validates existing Holocrons
 - **Version** - Shows version information
 - **Context** - Manages context refresh files
+- **Progress** - Manages progress log entries
+- **Onboard** - Displays framework guide and processes context refreshes
+- **Framework** - Displays framework documentation
+- **Guide** - Displays specific guides
+- **Status** - Shows holocron information
 - **Longform** - Handles documentation concatenation
 - **Suggest** - Manages framework suggestions
+- **Contribute** - Initializes contributor working memory
 
 ### Template Management (`lib/holocron/template_manager.rb`)
 
@@ -75,18 +82,15 @@ Handles the creation and management of Holocron templates:
 - **Template copying** - Copies embedded templates to target directories
 - **File generation** - Creates placeholder files with proper content
 - **Directory structure** - Ensures correct directory hierarchy
-- **Configuration** - Generates configuration files
+- **File generation** - Creates all necessary files and directories
 
-### Configuration System
+### Holocron Detection
 
-Uses YAML for configuration management:
+Holocrons are detected by the presence of a `_memory/` directory:
 
-```yaml
-base_repo: "https://github.com/dandailey/holocron"
-base_version: "0.1.0"
-obsidian_vault: null
-local_base_path: null
-```
+- **No configuration files required** - Simple directory-based detection
+- **Atomic design** - Each holocron is completely self-contained
+- **Portable** - Can be moved between environments without dependencies
 
 ## File Structure
 
@@ -110,7 +114,6 @@ holocron/
 ### Generated Holocron Structure
 ```
 project/
-├── .holocron.yml           # Configuration
 ├── README.md               # Main documentation
 ├── action_plan.md          # Project plan
 ├── project_overview.md     # High-level overview
@@ -153,17 +156,17 @@ project/
 **Alternatives considered**: Download from GitHub, symlink to master repo
 **Trade-offs**: Requires gem updates for template changes, but simpler distribution
 
-### Configuration Format: YAML
+### Holocron Detection: Directory-Based
 
-**Decision**: Use YAML for configuration files
+**Decision**: Use `_memory/` directory presence for holocron detection
 **Rationale**:
-- Human-readable
-- Easy to parse
-- Widely supported
-- Good for structured data
+- Simple and reliable
+- No configuration files to manage
+- Self-contained and portable
+- Easy to understand and debug
 
-**Alternatives considered**: JSON, TOML, custom format
-**Trade-offs**: YAML can be complex, but more readable than JSON
+**Alternatives considered**: Configuration files, metadata files, symlinks
+**Trade-offs**: Less metadata available, but much simpler and more reliable
 
 ### Command Structure: Modular
 
@@ -186,14 +189,13 @@ project/
 3. Init command validates input
 4. Template manager creates directory structure
 5. Template manager copies embedded templates
-6. Configuration file is generated
-7. Success message is displayed
+6. Success message is displayed
 
 ### Validation Flow
 
 1. User runs `holo doctor my-project`
 2. CLI parses arguments and options
-3. Doctor command loads configuration
+3. Doctor command detects holocron by `_memory/` directory
 4. Doctor command checks directory structure
 5. Doctor command validates required files
 6. Doctor command checks file permissions
@@ -215,7 +217,7 @@ project/
 
 1. **User errors** - Invalid arguments, missing files
 2. **System errors** - Permission denied, disk full
-3. **Configuration errors** - Invalid YAML, missing config
+3. **Holocron detection errors** - Missing `_memory/` directory
 4. **Template errors** - Missing templates, write failures
 
 ### Error Handling Strategy

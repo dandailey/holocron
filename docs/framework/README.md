@@ -6,15 +6,14 @@ Your **Holocron** is your personal, persistent memory for the project you're wor
 
 Your Holocron is like the VHS tape Drew Barrymore's character watches every morning in "50 First Dates" to remind her WTF is going on. You'll only remember what you write there, so be very deliberate, careful, and diligent about what you put there!
 
-## Multilevel Architecture
+## Atomic Architecture
 
-Holocron supports a hierarchical structure for managing knowledge across multiple projects:
+Holocron uses an atomic approach where each holocron is completely self-contained:
 
-- **Base Holocron**: Base framework knowledge shared across all projects
-- **App Holocron**: Application-level knowledge for specific applications
-- **Project Holocron**: Project-specific knowledge within an application
-
-Each holocron can be self-contained with vendored framework files, ensuring portability and independence while maintaining the ability to share knowledge and upgrade frameworks.
+- **No hierarchy** - Each holocron is independent and portable
+- **No configuration files** - Detection is based on `_memory/` directory presence only
+- **Self-contained** - All necessary files are included in each holocron
+- **Portable** - Can be moved between environments without dependencies
 
 ## Onboarding (Your First Prompt)
 
@@ -38,23 +37,12 @@ Understanding how to read from, write to, AND FOLLOW your own Holocron is your f
 
 ## Your Holocron Structure
 
-### Configuration Files
+### Holocron Detection
 
-`.holocron_base.yml` - Configuration file that defines the holocron's type, version, and hierarchy:
-- **holocron_type**: base, app, or project
-- **base_version**: Framework version being used
-- **base_repo**: Source repository for framework updates
-- **parent_holocron**: Path to parent holocron (for project-level holocrons)
-- **app_holocron**: Path to app-level holocron (for project-level holocrons)
-- **contribute_mode**: How contributions are handled (local, github_issue, github_pr, disabled)
+Holocrons are detected by the presence of a `_memory/` directory. No configuration files are required.
 
 ### Framework Directory
 
-`_framework/` - Vendored framework files for self-containment (optional):
-- **README.md**: Framework documentation and version info
-- **shared_guides/**: Cross-project knowledge and best practices
-- **templates/**: Framework templates for different holocron types
-- **VERSION**: Version tracking file
 
 ### Root Holocron Files
 
@@ -131,6 +119,14 @@ Questions you should ask yourself (EVERY TIME):
 
 > The objective is to leave future-you with a clean repo, passing tests, and a clear breadcrumb trail—not a pile of mystery changes.
 
+## Getting Help
+
+**Standard help syntax:**
+- `holo help` - Show all available commands
+- `holo help <command>` - Show detailed help for a specific command
+
+**Important:** Do not use `--help` flags (e.g., `holo init --help`) as they are treated as command arguments, not help requests.
+
 ## Holocron Commands
 
 The `holo` command provides all the tools you need to manage your Holocron. **Note:** Holocron is installed as a system gem, so you can run commands directly with `holo` (no `bundle exec` needed). Here's a complete reference:
@@ -150,12 +146,7 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
 - **Parameters:** 
   - `DIRECTORY` (optional): Where to create the Holocron (default: current directory)
   - `--into=DIR`: Alternative way to specify directory
-  - `--type=TYPE`: Type of holocron (base|app|project, default: app)
-  - `--parent=PARENT`: Path to parent holocron (for project-level holocrons)
-  - `--app=APP`: Path to app-level holocron (for project-level holocrons)
-  - `--contribute-mode=MODE`: Contribution mode (local|github_issue|github_pr|disabled, default: local)
-  - `--vendor`: Vendor framework files for self-containment
-- **Example:** `holo init my-project --type=app --vendor` or `holo init . --type=project --parent=../app-holocron`
+- **Example:** `holo init my-project` or `holo init .`
 
 **`holo doctor [DIRECTORY]`** - Validate Holocron structure
 - **What it does:** Checks for common issues and validates your Holocron structure
@@ -168,7 +159,7 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
 ### Context Management
 
 **`holo context-new [REASON]`** - Create a context refresh file
-- **What it does:** Creates a timestamped context refresh file with `_PENDING_` prefix
+- **What it does:** Creates a timestamped context refresh file ready for immediate use
 - **When to use:** When your context window is getting full or you need to hand off work
 - **Parameters:**
   - `REASON` (optional): Brief description of current state
@@ -178,7 +169,7 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
   - `--content=CONTENT`: Full detailed content (if not provided, creates template for manual editing)
   - `--full_content=CONTENT`: Alias for --content
 - **Example:** `holo context-new "Completed user auth" --slug "auth_milestone" --content "Full verbose context refresh content..."`
-- **Note:** Use --content for direct input, or edit the template file and rename to remove `_PENDING_` prefix (or use `holo onboard`)
+- **Note:** Use --content for direct input, or edit the template file manually
 
 **`holo progress SUMMARY`** - Add a progress log entry
 - **What it does:** Creates a detailed progress log entry and updates the main progress log
@@ -231,29 +222,15 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
   - `--open-issue`: Open a GitHub issue (future feature)
 - **Example:** `holo suggest "Add support for custom templates"`
 
-### Multilevel Architecture Commands
+### Status Commands
 
-**`holo status [DIRECTORY]`** - Show holocron hierarchy and version information
-- **What it does:** Displays holocron type, version, framework vendoring status, and hierarchy
-- **When to use:** When you need to understand a holocron's configuration and status
+**`holo status [DIRECTORY]`** - Show holocron information
+- **What it does:** Displays holocron location and framework information
+- **When to use:** When you need to understand a holocron's status and structure
 - **Parameters:**
   - `DIRECTORY` (optional): Directory to check (default: current directory)
 - **Example:** `holo status` or `holo status /path/to/holocron`
 
-**`holo vendor [DIRECTORY]`** - Vendor framework files for self-containment
-- **What it does:** Creates a vendored copy of the framework in the `_framework/` directory
-- **When to use:** When you want to make a holocron self-contained and portable
-- **Parameters:**
-  - `DIRECTORY` (optional): Directory containing the holocron (default: current directory)
-- **Example:** `holo vendor` or `holo vendor /path/to/holocron`
-
-**`holo upgrade [DIRECTORY]`** - Update vendored framework from base repository
-- **What it does:** Updates the vendored framework files to the latest version
-- **When to use:** When you want to update your vendored framework with latest changes
-- **Parameters:**
-  - `DIRECTORY` (optional): Directory containing the holocron (default: current directory)
-  - `--force`: Force upgrade even if already up to date
-- **Example:** `holo upgrade` or `holo upgrade --force`
 
 ### Utility Commands
 
@@ -269,6 +246,7 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
 - **Parameters:**
   - `COMMAND` (optional): Specific command to get help for
 - **Example:** `holo help` or `holo help context-new`
+- **Note:** Use `holo help <command>` syntax. Do not use `--help` flags as they are treated as command arguments.
 
 ## Quick Reference & Terms
 

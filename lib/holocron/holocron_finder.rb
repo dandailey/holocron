@@ -2,7 +2,6 @@
 
 require 'fileutils'
 require 'colorize'
-require 'holocron/config_manager'
 
 module Holocron
   class HolocronFinder
@@ -13,7 +12,7 @@ module Holocron
         return explicit_path if valid_holocron_directory?(explicit_path)
 
         puts "❌ Specified directory '#{explicit_dir}' is not a valid holocron directory".colorize(:red)
-        puts '   Expected to find either .holocron_base.yml or .holocron.yml or _memory/ directory'.colorize(:yellow)
+        puts '   Expected to find _memory/ directory'.colorize(:yellow)
         return nil
       end
 
@@ -32,36 +31,21 @@ module Holocron
     def self.valid_holocron_directory?(directory)
       return false unless Dir.exist?(directory)
 
-      # Check for new format
-      return true if File.exist?(File.join(directory, '.holocron_base.yml'))
-
-      # Check for old format
-      return true if File.exist?(File.join(directory, '.holocron.yml'))
-
-      # Check for _memory directory (indicates holocron structure)
-      return true if Dir.exist?(File.join(directory, '_memory'))
-
-      false
+      Dir.exist?(File.join(directory, '_memory'))
     end
 
     def initialize(start_dir = '.')
       @start_dir = File.expand_path(start_dir)
-      @config_manager = ConfigManager.new(@start_dir)
     end
 
     def auto_discover
-      # Try to find using new format first
-      holocron_dir = @config_manager.find_holocron_directory(@start_dir)
-      return holocron_dir if holocron_dir
-
       # Check if we're already in a holocron directory
       return @start_dir if self.class.valid_holocron_directory?(@start_dir)
 
-      # Look for old .holocron.yml format
+      # Walk up the directory tree looking for _memory/ directory
       current_dir = @start_dir
       loop do
-        old_config_path = File.join(current_dir, '.holocron.yml')
-        return current_dir if File.exist?(old_config_path)
+        return current_dir if self.class.valid_holocron_directory?(current_dir)
 
         parent_dir = File.dirname(current_dir)
         break if parent_dir == current_dir # Reached root
@@ -86,7 +70,7 @@ module Holocron
       puts '  holo --dir .holocron/sync <command>'.colorize(:cyan)
       puts
       puts 'A valid holocron directory contains:'.colorize(:yellow)
-      puts '  • .holocron_base.yml (new format) OR .holocron.yml (old format) OR _memory/ directory'.colorize(:white)
+      puts '  • _memory/ directory'.colorize(:white)
       puts
       puts 'Current directory: '.colorize(:yellow) + @start_dir
       puts

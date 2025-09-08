@@ -15,10 +15,19 @@ Progress logging captures what was accomplished in a session or work period. It 
 
 ## How to Use Progress Logging
 
-### Basic Command
+### CLI Command (Recommended)
+
+**Use this approach for all progress logging:**
+
 ```bash
 holo progress "Brief summary of work" --slug "descriptive_slug" --content "Full detailed content"
 ```
+
+**This single command handles everything automatically:**
+- Creates detailed log file in `_memory/progress_logs/`
+- Updates main `progress_log.md` with verbose summary
+- No manual file editing or management required
+- Ensures consistent formatting and structure
 
 ### Parameters
 - **`SUMMARY`** (required): Brief description of what was accomplished

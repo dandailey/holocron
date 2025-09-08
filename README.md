@@ -15,6 +15,10 @@ holo init my-awesome-project
 
 # Validate your setup
 holo doctor my-awesome-project
+
+# Get help
+holo help                    # Show all commands
+holo help init              # Show help for specific command
 ```
 
 ## What is Holocron?

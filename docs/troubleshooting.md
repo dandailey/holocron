@@ -7,7 +7,7 @@ This guide helps you resolve common issues with Holocron.
 - [Installation Issues](#installation-issues)
 - [Command Issues](#command-issues)
 - [File System Issues](#file-system-issues)
-- [Configuration Issues](#configuration-issues)
+- [Holocron Detection Issues](#holocron-detection-issues)
 - [Performance Issues](#performance-issues)
 - [Getting Help](#getting-help)
 
@@ -248,42 +248,20 @@ This guide helps you resolve common issues with Holocron.
    fsck /dev/disk  # Linux/macOS
    ```
 
-## Configuration Issues
+## Holocron Detection Issues
 
-### "Invalid YAML" error
+### "No holocron found" error
 
-**Problem**: Configuration file has invalid YAML syntax.
-
-**Solutions**:
-
-1. **Check YAML syntax**:
-   ```bash
-   cat .holocron.yml
-   ```
-
-2. **Validate YAML**:
-   ```bash
-   ruby -ryaml -e "YAML.load_file('.holocron.yml')"
-   ```
-
-3. **Recreate configuration**:
-   ```bash
-   rm .holocron.yml
-   holo init .
-   ```
-
-### "Missing configuration" error
-
-**Problem**: Configuration file is missing or not found.
+**Problem**: Holocron is not detected in the current directory.
 
 **Solutions**:
 
-1. **Check if file exists**:
+1. **Check if _memory/ directory exists**:
    ```bash
-   ls -la .holocron.yml
+   ls -la _memory/
    ```
 
-2. **Recreate configuration**:
+2. **Initialize holocron**:
    ```bash
    holo init .
    ```
@@ -294,26 +272,26 @@ This guide helps you resolve common issues with Holocron.
    # Make sure you're in the right directory
    ```
 
-### Configuration not loading
+### "Invalid holocron structure" error
 
-**Problem**: Configuration changes aren't being applied.
+**Problem**: Holocron directory structure is incomplete or corrupted.
 
 **Solutions**:
 
-1. **Check file permissions**:
+1. **Check directory structure**:
    ```bash
-   ls -la .holocron.yml
+   ls -la _memory/
    ```
 
-2. **Verify YAML syntax**:
+2. **Recreate holocron**:
    ```bash
-   ruby -ryaml -e "YAML.load_file('.holocron.yml')"
+   rm -rf _memory/
+   holo init .
    ```
 
-3. **Restart the command**:
+3. **Use doctor command to fix**:
    ```bash
-   # Configuration is loaded fresh each time
-   holo doctor
+   holo doctor --fix
    ```
 
 ## Performance Issues
@@ -371,6 +349,51 @@ This guide helps you resolve common issues with Holocron.
    # Monitor memory usage over time
    while true; do ps aux | grep holo; sleep 1; done
    ```
+
+## Advanced Workflows
+
+### Manual Context Refresh Editing
+
+If you prefer to edit context refresh files manually instead of using the CLI with `--content`:
+
+1. **Create a template file**:
+   ```bash
+   holo context-new "Brief description"
+   ```
+
+2. **Edit the `_PENDING_` file**:
+   - File is created in `_memory/context_refresh/` with `_PENDING_` prefix
+   - Add your comprehensive content to the template
+   - Include all relevant details about current state
+
+3. **Finalize the file**:
+   ```bash
+   # Rename to remove _PENDING_ prefix
+   mv _memory/context_refresh/_PENDING_2025_09_05_143022_context_refresh.md \
+      _memory/context_refresh/2025_09_05_143022_context_refresh.md
+   ```
+
+**Note**: This is an advanced workflow. Most users should use `holo context-new --content` for simplicity.
+
+### Manual Progress Log Management
+
+If you need to manually manage progress logs:
+
+1. **Create detailed log file**:
+   ```bash
+   # Create in _memory/progress_logs/
+   echo "# Your detailed content" > _memory/progress_logs/2025_09_05_143022_progress_update.md
+   ```
+
+2. **Update main progress log**:
+   ```bash
+   # Add summary to progress_log.md
+   echo "## 2025-09-05: Brief summary" >> progress_log.md
+   echo "Detailed description..." >> progress_log.md
+   echo "*Detailed log: \`_memory/progress_logs/2025_09_05_143022_progress_update.md\`*" >> progress_log.md
+   ```
+
+**Note**: This is an advanced workflow. Most users should use `holo progress --content` for automatic handling.
 
 ## Getting Help
 

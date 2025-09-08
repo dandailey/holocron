@@ -2,7 +2,6 @@
 
 require 'fileutils'
 require 'colorize'
-require 'holocron/config_manager'
 require 'holocron/holocron_finder'
 
 module Holocron
@@ -10,7 +9,6 @@ module Holocron
     class Onboard < BaseCommand
       def initialize(options = {})
         super(options)
-        @config_manager = ConfigManager.new('.')
       end
 
       def call

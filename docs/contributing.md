@@ -54,10 +54,10 @@ This project follows a simple code of conduct:
 bundle install
 
 # Initialize your working memory
-bundle exec exe/holo contribute
+holo contribute
 
 # Verify installation
-bundle exec exe/holo version
+holo version
 ```
 
 ### Run Tests
@@ -115,8 +115,8 @@ git checkout -b fix/issue-description
 bundle exec rspec
 
 # Test the CLI commands
-bundle exec exe/holo init test-project
-bundle exec exe/holo doctor test-project
+holo init test-project
+holo doctor test-project
 rm -rf test-project
 
 # Check code style
@@ -223,7 +223,7 @@ RSpec.describe Holocron::Commands::Init do
       command.call
       
       expect(File.exist?(File.join(temp_dir, "README.md"))).to be true
-      expect(File.exist?(File.join(temp_dir, ".holocron.yml"))).to be true
+      expect(Dir.exist?(File.join(temp_dir, "_memory"))).to be true
     end
   end
 end

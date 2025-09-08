@@ -11,17 +11,22 @@ When your context window is getting full or you need to hand off to a future ses
 
 ## How to Create a Context Refresh
 
-1. Run: `holo context-new "Brief description of current state"`
-2. This creates a timestamped file with `_PENDING_` prefix in `_memory/context_refresh/`
-3. Edit the file to add comprehensive details about:
-   - What you've accomplished
-   - Current state of the project
-   - What needs to be done next
-   - Any important decisions or discoveries
-   - Links to relevant files or resources
-4. **IMPORTANT**: Rename the file to remove the `_PENDING_` prefix to mark it as executed
-   - Example: `_PENDING_2025_09_05_143022_context_refresh.md` → `2025_09_05_143022_context_refresh.md`
-   - **Note**: Timestamps now include time (HHMMSS) to prevent naming conflicts and make chronological order clear
+### CLI Command (Recommended)
+
+**Use this approach for all context refreshes:**
+
+```bash
+holo context-new "Brief description of current state" --slug "descriptive_slug" --content "Full detailed content"
+```
+
+This creates a properly named, timestamped file directly in `_memory/context_refresh/` with your content already in place. No manual editing or file renaming required.
+
+**Parameters:**
+- `REASON` (required): Brief description of current state
+- `--slug=SLUG`: Custom filename slug (default: context_refresh)
+- `--name=SLUG`: Alias for --slug
+- `--content=CONTENT`: Full detailed content
+- `--full-content=CONTENT`: Alias for --content
 
 ## Example Context Refresh
 
@@ -52,7 +57,7 @@ When starting a new session, check for context refresh files in `_memory/context
 ### Automated Loading
 Use `holo onboard` to automatically:
 - Display the framework guide
-- Process any pending context refreshes (files with `_PENDING_` prefix)
+- Process any pending context refreshes
 - Rename pending files to mark them as executed
 - Display the content of processed refreshes
 

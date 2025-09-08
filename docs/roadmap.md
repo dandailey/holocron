@@ -6,9 +6,9 @@ This document outlines the development roadmap for Holocron, including planned f
 
 ✅ **Completed Features:**
 - Basic gem structure with Thor CLI
-- Core commands: `init`, `doctor`, `version`, `context-new`, `suggest`, `longform concat`
+- Core commands: `init`, `doctor`, `version`, `context-new`, `progress`, `onboard`, `framework`, `guide`, `status`, `suggest`, `contribute`, `longform concat`
 - Template system for self-contained Holocrons
-- Configuration management with YAML
+- Atomic architecture with `_memory/` directory detection
 - Comprehensive documentation
 
 ## Phase 1: Foundation & Polish (v0.2.0)
@@ -23,7 +23,6 @@ This document outlines the development roadmap for Holocron, including planned f
 
 ### CLI Enhancements
 - [ ] **Interactive mode** - `holo interactive` for guided setup
-- [ ] **Configuration management** - `holo config` command for settings
 - [ ] **Better help system** - Improved help text and examples
 - [ ] **Progress indicators** - Visual feedback for long operations
 

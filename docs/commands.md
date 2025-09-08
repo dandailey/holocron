@@ -10,6 +10,11 @@ Holocron provides a simple CLI with the following commands:
 - `holo doctor` - Validate Holocron structure
 - `holo version` - Show version information
 - `holo context-new` - Create context refresh files
+- `holo progress` - Add progress log entries
+- `holo onboard` - Display framework guide and process context refreshes
+- `holo framework` - Display framework documentation
+- `holo guide` - Display specific guides
+- `holo status` - Show holocron information
 - `holo longform concat` - Concatenate documentation
 - `holo suggest` - Submit framework suggestions
 - `holo contribute` - Initialize working memory for contributing to this project
@@ -50,7 +55,6 @@ holo init --into docs/holocron
 **What it creates:**
 - Complete directory structure (`_memory/`, `longform_docs/`, `files/`)
 - All required files (`README.md`, `action_plan.md`, etc.)
-- Configuration file (`.holocron.yml`)
 - Placeholder content for immediate use
 
 ### `holo doctor [DIRECTORY]`
@@ -124,9 +128,115 @@ holo context-new
 
 **What it creates:**
 - Context refresh file in `_memory/context_refresh/`
-- Timestamped filename with `_PENDING_` prefix
+- Timestamped filename (YYYY_MM_DD_HHMMSS format)
 - Template with sections for objectives, decisions, files, blockers
-- Instructions for completing and finalizing
+- Ready for immediate use (no manual editing required)
+
+### `holo progress SUMMARY`
+
+Add a progress log entry to document work completed.
+
+**Usage:**
+```bash
+holo progress SUMMARY
+```
+
+**Options:**
+- `--slug SLUG` - Custom filename slug (default: progress_update)
+- `--name SLUG` - Alias for --slug
+- `--content CONTENT` - Full detailed content (default: uses SUMMARY)
+- `--full-content CONTENT` - Alias for --content
+
+**Examples:**
+```bash
+# Basic usage
+holo progress "Added user authentication system"
+
+# With custom slug and content
+holo progress "Fixed critical bug" --slug "bug_fix" --content "Detailed description of the fix..."
+```
+
+**What it creates:**
+- Detailed log file in `_memory/progress_logs/`
+- Updates main `progress_log.md` with summary
+- Timestamped filename (YYYY_MM_DD_HHMMSS format)
+
+### `holo onboard`
+
+Display the framework guide and process any pending context refreshes.
+
+**Usage:**
+```bash
+holo onboard
+```
+
+**What it does:**
+- Displays the complete Holocron framework guide
+- Automatically processes any pending context refreshes
+- Renames `_PENDING_` files to mark them as executed
+- Shows content of processed refreshes
+
+**⚠️ WARNING:** Only run once per session! This command consumes ALL pending context refreshes.
+
+### `holo framework`
+
+Display the Holocron framework guide.
+
+**Usage:**
+```bash
+holo framework
+```
+
+**What it does:**
+- Shows the complete framework documentation
+- Same content as `holo onboard` but without context refresh processing
+
+### `holo guide [GUIDE_NAME]`
+
+Display a specific Holocron guide.
+
+**Usage:**
+```bash
+holo guide [GUIDE_NAME]
+```
+
+**Available guides:**
+- `refreshing-context` - How to create context refreshes
+- `progress-logging` - How to log progress
+- `offboarding` - How to offboard from a session
+- `creating-long-form-docs` - How to create long documents
+
+**Examples:**
+```bash
+# Show all available guides
+holo guide
+
+# Show specific guide
+holo guide progress-logging
+```
+
+### `holo status [DIRECTORY]`
+
+Show holocron information and status.
+
+**Usage:**
+```bash
+holo status [DIRECTORY]
+```
+
+**What it shows:**
+- Holocron location and detection status
+- Framework information
+- Directory structure validation
+
+**Examples:**
+```bash
+# Check current directory
+holo status
+
+# Check specific directory
+holo status my-project
+```
 
 ### `holo longform concat DIRECTORY`
 
@@ -287,14 +397,9 @@ cat _memory/suggestion_queue/*.md
 
 ## Configuration
 
-Holocron uses a `.holocron.yml` configuration file:
+Holocron detects holocrons by the presence of a `_memory/` directory:
 
-```yaml
-base_repo: "https://github.com/dandailey/holocron"
-base_version: "0.1.0"
-obsidian_vault: null
-local_base_path: null
-```
+No configuration file is required. Holocrons are automatically detected by the presence of a `_memory/` directory.
 
 ## Troubleshooting Commands
 
@@ -326,7 +431,7 @@ holo doctor --fix
 
 # Check specific files
 ls -la _memory/
-cat .holocron.yml
+ls -la _memory/
 ```
 
 ## Next Steps
