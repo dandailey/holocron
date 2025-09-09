@@ -124,7 +124,7 @@ module Holocron
           - **Track decisions** in `_memory/decision_log.md`
           - **Log progress** in `_memory/progress_logs/`
           - **Document environment** in `_memory/env_setup.md`
-          - **Create context refreshes** with `holo context-new "reason"`
+          - **Create context refreshes** with `holo context-refresh --name "reason"`
           - **Submit suggestions** with `holo suggest "idea"`
 
           ## Project Context
@@ -134,7 +134,7 @@ module Holocron
           ### Key Features
           - `holo init` - Initialize new Holocron projects
           - `holo doctor` - Validate Holocron structure
-          - `holo context-new` - Create context refresh files
+          - `holo context-refresh` - Create context refresh files
           - `holo longform concat` - Concatenate documentation
           - `holo suggest` - Submit framework suggestions
 

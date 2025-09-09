@@ -71,7 +71,7 @@ holo doctor my-project
 
 ### Create Context Refresh
 ```bash
-holo context-new "Reached milestone, need to hand off to future-me"
+holo context-refresh --name "milestone_reached"
 # Creates a context refresh file for session handoffs
 ```
 
@@ -91,6 +91,16 @@ holo suggest "Add support for custom templates"
 ```bash
 holo contribute
 # Creates project-specific working memory for contributors
+```
+
+### Manage Buffer for Longform Content
+```bash
+holo buffer                    # Show buffer content (default action)
+holo buffer clear             # Clear the buffer
+holo buffer status            # Show buffer file status
+holo progress --from-buffer --summary "Summary" --name "entry_name"  # Use buffer content for progress entry
+holo context-refresh --name "reason"     # Create context refresh with custom name
+holo suggest --from-buffer               # Use buffer content for suggestion
 ```
 
 ## Development

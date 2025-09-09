@@ -9,7 +9,7 @@ Holocron provides a simple CLI with the following commands:
 - `holo init` - Initialize a new Holocron
 - `holo doctor` - Validate Holocron structure
 - `holo version` - Show version information
-- `holo context-new` - Create context refresh files
+- `holo context-refresh` - Create context refresh files
 - `holo progress` - Add progress log entries
 - `holo onboard` - Display framework guide and process context refreshes
 - `holo framework` - Display framework documentation
@@ -18,6 +18,7 @@ Holocron provides a simple CLI with the following commands:
 - `holo longform concat` - Concatenate documentation
 - `holo suggest` - Submit framework suggestions
 - `holo contribute` - Initialize working memory for contributing to this project
+- `holo buffer` - Manage buffer file for longform content
 
 ## Global Options
 
@@ -102,28 +103,25 @@ holo version
 Holocron 0.1.0
 ```
 
-### `holo context-new [REASON]`
+### `holo context-refresh`
 
 Create a new context refresh file for session handoffs.
 
 **Usage:**
 ```bash
-holo context-new [REASON]
+holo context-refresh
 ```
 
 **Options:**
-- `--why REASON` - Reason for context refresh
+- `--name NAME` - Custom name for the entry (default: context_refresh)
 
 **Examples:**
 ```bash
-# Create with reason
-holo context-new "Reached milestone, need to hand off to future-me"
+# Basic usage
+holo context-refresh
 
-# Create with option
-holo context-new --why "Weekend break, picking up Monday"
-
-# Create without reason (will prompt)
-holo context-new
+# With custom name
+holo context-refresh --name "feature_complete"
 ```
 
 **What it creates:**
@@ -132,28 +130,33 @@ holo context-new
 - Template with sections for objectives, decisions, files, blockers
 - Ready for immediate use (no manual editing required)
 
-### `holo progress SUMMARY`
+### `holo progress [CONTENT]`
 
 Add a progress log entry to document work completed.
 
 **Usage:**
 ```bash
-holo progress SUMMARY
+holo progress [CONTENT]
 ```
 
 **Options:**
-- `--slug SLUG` - Custom filename slug (default: progress_update)
-- `--name SLUG` - Alias for --slug
-- `--content CONTENT` - Full detailed content (default: uses SUMMARY)
-- `--full-content CONTENT` - Alias for --content
+- `--summary SUMMARY` - Brief summary (auto-generated if not provided)
+- `--name NAME` - Custom name for the entry (default: progress_update)
+- `--from-buffer` - Read content from buffer file instead of CONTENT argument
 
 **Examples:**
 ```bash
-# Basic usage
-holo progress "Added user authentication system"
+# Basic usage with content
+holo progress "Added user authentication system with JWT tokens and role-based access control"
 
-# With custom slug and content
-holo progress "Fixed critical bug" --slug "bug_fix" --content "Detailed description of the fix..."
+# With custom summary and name
+holo progress "Detailed implementation notes..." --summary "Added user auth" --name "user_auth"
+
+# Using buffer file for longform content
+holo progress --from-buffer --summary "Major refactoring" --name "refactor"
+
+# Minimal usage (just buffer)
+holo progress --from-buffer
 ```
 
 **What it creates:**
@@ -282,6 +285,7 @@ holo suggest [MESSAGE]
 
 **Options:**
 - `--open-issue` - Open a GitHub issue (not yet implemented)
+- `--from-buffer` - Read content from buffer file instead of MESSAGE
 
 **Examples:**
 ```bash
@@ -290,6 +294,9 @@ holo suggest "Add support for custom templates"
 
 # Create suggestion with option
 holo suggest "Add support for custom templates" --open-issue
+
+# Using buffer file for longform content
+holo suggest --from-buffer
 ```
 
 **What it creates:**
@@ -347,13 +354,13 @@ cd my-awesome-project
 holo doctor
 
 # Create context refresh
-holo context-new "Starting development phase"
+holo context-refresh --name "starting_development"
 
 # Work on project...
 # (edit files, make progress)
 
 # Create another context refresh
-holo context-new "Ready for testing phase"
+holo context-refresh --name "ready_for_testing"
 
 # Validate before committing
 holo doctor
@@ -400,6 +407,46 @@ cat _memory/suggestion_queue/*.md
 Holocron detects holocrons by the presence of a `_memory/` directory:
 
 No configuration file is required. Holocrons are automatically detected by the presence of a `_memory/` directory.
+
+### `holo buffer [ACTION]`
+
+Manage buffer file for longform content. The buffer system allows AI agents to write complex markdown content to a file and use it with other commands, avoiding CLI argument length limits and escaping issues.
+
+**Usage:**
+```bash
+holo buffer [ACTION]
+```
+
+**Actions:**
+- `show` (default) - Display buffer content
+- `clear` - Clear the buffer file
+- `status` - Show buffer file information
+
+**Examples:**
+```bash
+# Show buffer content (default action)
+holo buffer
+
+# Clear the buffer
+holo buffer clear
+
+# Show buffer status
+holo buffer status
+```
+
+**Buffer File Location:**
+- `_memory/tmp/buffer` - The buffer file location
+
+**Integration with Other Commands:**
+The `--from-buffer` flag can be used with:
+- `holo progress --from-buffer`
+- `holo suggest --from-buffer`
+
+**Workflow (for AI agents):**
+1. Write content to `_memory/tmp/buffer` using file writing tools/functions
+2. Use `holo buffer` to verify content
+3. Run commands with `--from-buffer` flag
+4. Use `holo buffer clear` when done
 
 ## Troubleshooting Commands
 

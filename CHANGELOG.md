@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release of Holocron gem
 - CLI framework using Thor
-- Core commands: `init`, `doctor`, `version`, `context-new`, `suggest`, `longform concat`
+- Core commands: `init`, `doctor`, `version`, `context-refresh`, `suggest`, `longform concat`
 - Template system for self-contained Holocrons
 - YAML configuration management
 - Comprehensive documentation
@@ -40,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`holo init`** - Initialize new Holocron projects
 - **`holo doctor`** - Validate Holocron structure and health
 - **`holo version`** - Display version information
-- **`holo context-new`** - Create context refresh files for session handoffs
+- **`holo context-refresh`** - Create context refresh files for session handoffs
 - **`holo suggest`** - Submit suggestions for framework improvements
 - **`holo longform concat`** - Concatenate numbered documentation files
 - **`holo contribute`** - Initialize project-specific working memory for contributors

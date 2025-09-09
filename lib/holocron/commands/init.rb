@@ -16,6 +16,7 @@ module Holocron
         puts "Initializing Holocron in #{@directory}...".colorize(:blue)
 
         create_directory_structure
+        create_buffer_file
         copy_templates
 
         puts '✅ Holocron initialized successfully!'.colorize(:green)
@@ -36,11 +37,17 @@ module Holocron
           _memory/progress_logs
           _memory/context_refresh
           _memory/knowledge_base
+          _memory/tmp
           longform_docs
           files
         ].each do |dir|
           FileUtils.mkdir_p(File.join(base_path, dir))
         end
+      end
+
+      def create_buffer_file
+        buffer_path = File.join(@directory, '_memory', 'tmp', 'buffer')
+        File.write(buffer_path, '')
       end
 
       def copy_templates

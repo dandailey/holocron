@@ -8,7 +8,7 @@ module Holocron
     class Suggest < BaseCommand
       def initialize(message, options)
         super(options)
-        @message = message
+        @message = determine_message(message, options)
       end
 
       def call
@@ -30,6 +30,35 @@ module Holocron
       end
 
       private
+
+      def determine_message(message, options)
+        if options[:from_buffer]
+          read_buffer_content
+        else
+          message
+        end
+      end
+
+      def read_buffer_content
+        buffer_path = File.join(@holocron_directory, '_memory', 'tmp', 'buffer')
+
+        unless File.exist?(buffer_path)
+          FileUtils.mkdir_p(File.dirname(buffer_path))
+          File.write(buffer_path, '')
+          puts 'Error: Buffer file was empty, created new one'.colorize(:red)
+          puts 'Add content to _memory/tmp/buffer first'.colorize(:yellow)
+          exit 1
+        end
+
+        content = File.read(buffer_path)
+        if content.strip.empty?
+          puts 'Error: Buffer file is empty'.colorize(:red)
+          puts 'Add content to _memory/tmp/buffer first'.colorize(:yellow)
+          exit 1
+        end
+
+        content
+      end
 
       def create_suggestion_file
         timestamp = Time.now.strftime('%Y_%m_%d_%H%M%S')

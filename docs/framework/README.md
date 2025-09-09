@@ -156,31 +156,49 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
   - `--fix`: Attempt to fix common issues automatically
 - **Example:** `holo doctor` or `holo doctor . --fix`
 
+### Buffer System for Longform Content
+
+**`holo buffer [ACTION]`** - Manage buffer file for complex content
+- **What it does:** Provides a file-based approach for writing complex markdown content
+- **When to use:** When CLI arguments become too long or contain problematic characters
+- **Actions:**
+  - `show` (default): Display current buffer content
+  - `clear`: Clear the buffer file
+  - `status`: Show buffer file information
+- **Example:** `holo buffer` or `holo buffer clear`
+
+**Buffer Integration:** The `--from-buffer` flag works with:
+- `holo progress --from-buffer`
+- `holo suggest --from-buffer`
+
+**Workflow (for AI agents):**
+1. Write content directly to `_memory/tmp/buffer` using your file writing tools/functions
+2. Use `holo buffer` to verify content
+3. Run commands with `--from-buffer` flag
+4. Use `holo buffer clear` when done
+
+**Important:** AI agents should write to the buffer file directly using their file writing tools rather than CLI commands. The whole point of the buffer is to avoid CLI argument length limits and shell escaping issues with complex markdown content.
+
+**Why use buffer?** Avoids CLI argument length limits and shell escaping issues with complex markdown content containing quotes, newlines, and special characters.
+
 ### Context Management
 
-**`holo context-new [REASON]`** - Create a context refresh file
+**`holo context-refresh`** - Create a context refresh file
 - **What it does:** Creates a timestamped context refresh file ready for immediate use
 - **When to use:** When your context window is getting full or you need to hand off work
 - **Parameters:**
-  - `REASON` (optional): Brief description of current state
-  - `--why=REASON`: Alternative way to specify reason
-  - `--slug=SLUG`: Custom filename slug (default: context_refresh)
-  - `--name=SLUG`: Alias for --slug
-  - `--content=CONTENT`: Full detailed content (if not provided, creates template for manual editing)
-  - `--full_content=CONTENT`: Alias for --content
-- **Example:** `holo context-new "Completed user auth" --slug "auth_milestone" --content "Full verbose context refresh content..."`
-- **Note:** Use --content for direct input, or edit the template file manually
+  - `--name=NAME`: Custom name for the entry (default: context_refresh)
+- **Example:** `holo context-refresh` or `holo context-refresh --name "feature_complete"`
 
-**`holo progress SUMMARY`** - Add a progress log entry
+**`holo progress [CONTENT]`** - Add a progress log entry
 - **What it does:** Creates a detailed progress log entry and updates the main progress log
 - **When to use:** When you complete significant work that should be documented
 - **Parameters:**
-  - `SUMMARY`: Brief description of what was accomplished
-  - `--slug=SLUG`: Custom filename slug (default: progress_update)
-  - `--name=SLUG`: Alias for --slug
-  - `--content=CONTENT`: Full detailed content (default: uses SUMMARY)
-  - `--full_content=CONTENT`: Alias for --content
-- **Example:** `holo progress "Added user authentication" --slug "auth_feature" --content "Implemented JWT-based auth with login/logout endpoints"`
+  - `CONTENT`: Full detailed content (optional if using --from-buffer)
+  - `--summary=SUMMARY`: Brief summary (auto-generated if not provided)
+  - `--name=NAME`: Custom name for the entry (default: progress_update)
+  - `--from-buffer`: Read content from buffer file (recommended for longform content)
+- **Example:** `holo progress --from-buffer` or `holo progress "Detailed content here" --summary "Brief summary" --name "feature_name"`
 
 ### Documentation Commands
 
@@ -220,7 +238,8 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
 - **Parameters:**
   - `MESSAGE` (optional): Your suggestion
   - `--open-issue`: Open a GitHub issue (future feature)
-- **Example:** `holo suggest "Add support for custom templates"`
+  - `--from-buffer`: Read content from buffer file (recommended for longform content)
+- **Example:** `holo suggest --from-buffer` or `holo suggest "Add support for custom templates"`
 
 ### Status Commands
 
@@ -245,7 +264,7 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
 - **When to use:** When you need to remember command syntax
 - **Parameters:**
   - `COMMAND` (optional): Specific command to get help for
-- **Example:** `holo help` or `holo help context-new`
+- **Example:** `holo help` or `holo help context-refresh`
 - **Note:** Use `holo help <command>` syntax. Do not use `--help` flags as they are treated as command arguments.
 
 ## Quick Reference & Terms

@@ -14,6 +14,7 @@ require 'holocron/commands/guide'
 require 'holocron/commands/onboard'
 require 'holocron/commands/progress'
 require 'holocron/commands/status'
+require 'holocron/commands/buffer'
 require 'holocron/holocron_finder'
 
 module Holocron
@@ -43,18 +44,15 @@ module Holocron
       Commands::Longform.new(directory, options).concat
     end
 
-    desc 'context-new [REASON]', 'Create a new context refresh file'
-    option :why, type: :string, desc: 'Reason for context refresh'
-    option :slug, type: :string, desc: 'Custom filename slug (default: context_refresh)'
-    option :name, type: :string, desc: 'Alias for --slug'
-    option :content, type: :string, desc: 'Full detailed content (if not provided, creates template for manual editing)'
-    option :full_content, type: :string, desc: 'Alias for --content'
-    def context_new(reason = nil)
-      Commands::Context.new(reason, options).new_refresh
+    desc 'context-refresh', 'Create a new context refresh file'
+    option :name, type: :string, desc: 'Custom name for the entry (default: context_refresh)'
+    def context_refresh
+      Commands::Context.new(options).new_refresh
     end
 
     desc 'suggest [MESSAGE]', 'Create a suggestion for the base Holocron framework'
     option :open_issue, type: :boolean, default: false, desc: 'Open a GitHub issue'
+    option :from_buffer, type: :boolean, desc: 'Read content from buffer file instead of MESSAGE'
     def suggest(message = nil)
       Commands::Suggest.new(message, options).call
     end
@@ -80,18 +78,22 @@ module Holocron
       Commands::Onboard.new(options).call
     end
 
-    desc 'progress SUMMARY', 'Add a progress log entry'
-    option :slug, type: :string, desc: 'Custom filename slug (default: progress_update)'
-    option :name, type: :string, desc: 'Alias for --slug'
-    option :content, type: :string, desc: 'Full detailed content (default: uses SUMMARY)'
-    option :full_content, type: :string, desc: 'Alias for --content'
-    def progress(summary)
-      Commands::Progress.new(summary, options).add_entry
+    desc 'progress [CONTENT]', 'Add a progress log entry'
+    option :summary, type: :string, desc: 'Brief summary (auto-generated if not provided)'
+    option :name, type: :string, desc: 'Custom name for the entry (default: progress_update)'
+    option :from_buffer, type: :boolean, desc: 'Read content from buffer file instead of CONTENT argument'
+    def progress(content = nil)
+      Commands::Progress.new(content, options).add_entry
     end
 
     desc 'status [DIRECTORY]', 'Show holocron hierarchy and version information'
     def status(directory = '.')
       Commands::Status.new(directory, options).call
+    end
+
+    desc 'buffer [ACTION]', 'Manage buffer file for longform content'
+    def buffer(action = nil)
+      Commands::Buffer.new(action, options).call
     end
 
     def self.exit_on_failure?

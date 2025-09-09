@@ -120,7 +120,7 @@ This guide helps you resolve common issues with Holocron.
 3. **Check option names**:
    ```bash
    # Correct
-   holo context-new "reason"
+   holo context-refresh --name "reason"
    
    # Incorrect
    holo context new "reason"
@@ -354,11 +354,11 @@ This guide helps you resolve common issues with Holocron.
 
 ### Manual Context Refresh Editing
 
-If you prefer to edit context refresh files manually instead of using the CLI with `--content`:
+If you prefer to edit context refresh files manually instead of using the CLI:
 
 1. **Create a template file**:
    ```bash
-   holo context-new "Brief description"
+   holo context-refresh --name "brief_description"
    ```
 
 2. **Edit the `_PENDING_` file**:
@@ -373,7 +373,7 @@ If you prefer to edit context refresh files manually instead of using the CLI wi
       _memory/context_refresh/2025_09_05_143022_context_refresh.md
    ```
 
-**Note**: This is an advanced workflow. Most users should use `holo context-new --content` for simplicity.
+**Note**: This is an advanced workflow. Most users should use `holo context-refresh` for simplicity.
 
 ### Manual Progress Log Management
 
@@ -393,7 +393,7 @@ If you need to manually manage progress logs:
    echo "*Detailed log: \`_memory/progress_logs/2025_09_05_143022_progress_update.md\`*" >> progress_log.md
    ```
 
-**Note**: This is an advanced workflow. Most users should use `holo progress --content` for automatic handling.
+**Note**: This is an advanced workflow. Most users should use `holo progress` for automatic handling.
 
 ## Getting Help
 

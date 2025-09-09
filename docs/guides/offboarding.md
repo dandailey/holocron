@@ -12,7 +12,15 @@ Offboarding ensures that all important work, decisions, and context from the cur
 
 Document what was accomplished using the progress logging system:
 
-**Command:** `holo progress "Summary" --slug "slug" --content "Full content"`
+**For simple content:** `holo progress "Full content here" --summary "Summary" --name "slug"`
+
+**For complex content (recommended):** 
+```bash
+# Write detailed content to buffer
+echo "## Major Accomplishments
+[detailed content...]" > _memory/tmp/buffer
+holo progress "Summary" --from-buffer
+```
 
 **The CLI command handles everything automatically:**
 - Creates detailed log file in `_memory/progress_logs/`
@@ -31,7 +39,9 @@ Document what was accomplished using the progress logging system:
 
 Create a comprehensive handoff summary using the context refresh system:
 
-**Command:** `holo context-new "Reason" --slug "slug" --content "Full content"`
+**Basic usage:** `holo context-refresh`
+
+**With custom name:** `holo context-refresh --name "reason"`
 
 **The CLI command handles everything automatically:**
 - Creates properly named, timestamped file in `_memory/context_refresh/`
@@ -94,13 +104,13 @@ Before finishing, verify:
 
 ### Progress Log Command
 ```bash
-holo progress "Summary" --slug "slug_name" --content "Full content"
+holo progress "Full content here" --summary "Summary" --name "slug_name"
 ```
 **This handles everything automatically** - creates detailed log file and updates main progress log.
 
 ### Context Refresh Command
 ```bash
-holo context-new "Reason" --slug "slug_name" --content "Full content"
+holo context-refresh --name "reason"
 ```
 **This handles everything automatically** - creates properly named file with your content, no manual editing needed.
 

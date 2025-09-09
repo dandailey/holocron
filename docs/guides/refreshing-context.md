@@ -13,20 +13,21 @@ When your context window is getting full or you need to hand off to a future ses
 
 ### CLI Command (Recommended)
 
-**Use this approach for all context refreshes:**
-
+**Basic usage:**
 ```bash
-holo context-new "Brief description of current state" --slug "descriptive_slug" --content "Full detailed content"
+holo context-refresh
 ```
 
-This creates a properly named, timestamped file directly in `_memory/context_refresh/` with your content already in place. No manual editing or file renaming required.
+**With custom name:**
+```bash
+holo context-refresh --name "auth_milestone_complete"
+```
 
-**Parameters:**
-- `REASON` (required): Brief description of current state
-- `--slug=SLUG`: Custom filename slug (default: context_refresh)
-- `--name=SLUG`: Alias for --slug
-- `--content=CONTENT`: Full detailed content
-- `--full-content=CONTENT`: Alias for --content
+**This single command handles everything automatically:**
+- Creates context refresh file in `_memory/context_refresh/`
+- Uses timestamped filename (YYYY_MM_DD_HHMMSS format)
+- Provides comprehensive template with all necessary sections
+- Ready for immediate editing with your preferred editor
 
 ## Example Context Refresh
 

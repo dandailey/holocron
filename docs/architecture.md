@@ -203,7 +203,7 @@ project/
 
 ### Context Refresh Flow
 
-1. User runs `holo context-new "reason"`
+1. User runs `holo context-refresh --name "reason"`
 2. CLI parses arguments and options
 3. Context command validates input
 4. Context command creates timestamped filename
