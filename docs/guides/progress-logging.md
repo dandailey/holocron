@@ -9,7 +9,7 @@ Progress logging captures what was accomplished in a session or work period. It 
 ## When to Use Progress Logging
 
 - **After completing significant work** - features, bugs, architecture changes
-- **At the end of a work session** - document what was accomplished
+- **At the end of a work session (offboarding)** - document what was accomplished
 - **After reaching milestones** - mark important progress points
 - **When asked specifically** - "update progress log" or "log this work"
 
@@ -42,7 +42,7 @@ holo progress "Full detailed content here" --summary "Brief summary" --name "des
 # - 95% test coverage achieved
 
 # Then use buffer with optional summary and name
-holo progress --from-buffer --summary "Authentication system complete" --name "auth_implementation"
+holo progress --from-buffer --summary "A paragraph or two to summarize the full writeup of what progress was made" --name "auth_implementation"
 
 # Or minimal usage (auto-generates summary and uses default name)
 holo progress --from-buffer
@@ -115,30 +115,33 @@ holo progress "Added user authentication system with JWT tokens and role-based a
 holo progress "Identified and resolved race condition in payment validation that was causing duplicate charges. Implemented proper locking mechanism and added comprehensive test coverage." --summary "Fixed critical race condition in payment validation that was causing duplicate charges" --name "payment_bug_fix"
 
 # Complex content using buffer (recommended)
-echo "## Major Refactoring Complete
+# AI agents: Write content directly to buffer file using file writing tools
+# File location: _memory/tmp/buffer
+# Content example:
+# ## Major Refactoring Complete
+# 
+# ### Database Layer Overhaul
+# - **Repository Pattern**: Implemented clean separation between data access and business logic
+# - **Query Optimization**: Reduced average query time by 40%
+# - **Test Coverage**: Achieved 95% coverage with comprehensive integration tests
+# 
+# ### Technical Implementation
+# - Created `UserRepository` and `OrderRepository` classes
+# - Added `DatabaseTransaction` wrapper for atomic operations
+# - Implemented `QueryBuilder` for dynamic query construction
+# - Added comprehensive error handling and logging
+# 
+# ### Performance Impact
+# - Query response time: 200ms → 120ms average
+# - Memory usage: Reduced by 15%
+# - Test execution time: 30s → 18s
+# 
+# ### Breaking Changes
+# - Updated all service classes to use repositories
+# - Modified API endpoints to handle new error responses
+# - Updated documentation and examples
 
-### Database Layer Overhaul
-- **Repository Pattern**: Implemented clean separation between data access and business logic
-- **Query Optimization**: Reduced average query time by 40%
-- **Test Coverage**: Achieved 95% coverage with comprehensive integration tests
-
-### Technical Implementation
-- Created `UserRepository` and `OrderRepository` classes
-- Added `DatabaseTransaction` wrapper for atomic operations
-- Implemented `QueryBuilder` for dynamic query construction
-- Added comprehensive error handling and logging
-
-### Performance Impact
-- Query response time: 200ms → 120ms average
-- Memory usage: Reduced by 15%
-- Test execution time: 30s → 18s
-
-### Breaking Changes
-- Updated all service classes to use repositories
-- Modified API endpoints to handle new error responses
-- Updated documentation and examples" > _memory/tmp/buffer
-
-holo progress "Database layer refactoring complete" --from-buffer
+holo progress --from-buffer --summary "Database layer refactoring complete" --name "db_refactor"
 ```
 
 ## Content Requirements
@@ -146,9 +149,7 @@ holo progress "Database layer refactoring complete" --from-buffer
 ### Main Progress Log Entry
 The main progress log entry should be:
 - **Verbose enough for high-level scanning** - you should understand what was accomplished without reading the detailed file
-- **Use markdown formatting** - headers, bullet points, paragraphs for clarity
 - **Include key details** - what was built, how it works, why it matters
-- **Be comprehensive** - cover all significant aspects of the work
 
 ### Detailed Log File
 The detailed log file should be:
@@ -175,55 +176,6 @@ The detailed log file should be:
 - **Security considerations** - vulnerabilities addressed, security improvements
 - **Breaking changes** - what might affect other parts of the system
 
-## Content Structure
-
-### Main Log Entry Structure
-```markdown
-## YYYY-MM-DD: Brief Summary
-
-Comprehensive description of what was accomplished. Include:
-- Key features implemented
-- Technical approach taken
-- Major decisions made
-- Impact and benefits
-- Any important context
-
-*Detailed log: `_memory/progress_logs/YYYY-MM-DD_slug.md`*
-```
-
-### Detailed Log Structure
-```markdown
-# Brief Summary
-
-**Date:** YYYY-MM-DD HH:MM:SS
-**Summary:** Brief description
-
-## Details
-
-Comprehensive technical details covering:
-- Implementation specifics
-- Architecture decisions
-- Code patterns used
-- Testing approach
-- Performance considerations
-
-## Impact
-
-What this work enables or improves:
-- New capabilities
-- Performance gains
-- Maintainability improvements
-- User experience enhancements
-
-## Next Steps
-
-What should happen next as a result of this work:
-- Follow-up tasks
-- Integration work
-- Testing needs
-- Documentation updates
-```
-
 ## Best Practices
 
 ### Be Comprehensive
@@ -243,146 +195,6 @@ What should happen next as a result of this work:
 - **What decisions were made** that could affect future work?
 - **What files or areas** need attention next?
 - **What problems were solved** and how?
-
-## Common Scenarios
-
-### After Completing a Feature
-```bash
-# Write comprehensive details to buffer first
-# Buffer content example:
-# ## User Profile System Implementation
-# 
-# ### Overview
-# Implemented complete user profile management system with full CRUD operations,
-# frontend interface, and cloud storage integration.
-# 
-# ### Technical Implementation
-# 
-# #### Backend Components
-# - **Profile Model** (`app/models/profile.rb`): ActiveRecord model with validations
-#   - Name, email, bio fields with appropriate length and format validations
-#   - Avatar attachment using Active Storage
-#   - Soft delete implementation for data retention
-# 
-# #### API Endpoints
-# - **ProfilesController** (`app/controllers/api/profiles_controller.rb`):
-#   - GET /api/profiles/:id - Fetch user profile
-#   - PUT /api/profiles/:id - Update profile data
-#   - POST /api/profiles/:id/avatar - Upload profile image
-#   - DELETE /api/profiles/:id - Soft delete profile
-# - All endpoints include proper authorization and input validation
-# - JSON API format for consistent response structure
-# 
-# #### Frontend Components
-# - **ProfileEditor** (`src/components/ProfileEditor.vue`): Main editing interface
-# - **AvatarUpload** (`src/components/AvatarUpload.vue`): Drag-drop image upload
-# - **ProfilePreview** (`src/components/ProfilePreview.vue`): Read-only display
-# 
-# #### S3 Integration
-# - Configured Active Storage with S3 backend for avatar uploads
-# - Image processing pipeline with ImageMagick for thumbnails
-# - CDN integration for fast image delivery
-# - Automatic cleanup of old avatars when new ones uploaded
-# 
-# ### Testing Coverage
-# - **Model tests**: 100% coverage including edge cases and validations
-# - **Controller tests**: All endpoints with success/failure scenarios
-# - **Integration tests**: End-to-end user flows
-# - **Frontend tests**: Component behavior and API integration
-# 
-# ### Performance Considerations
-# - Implemented eager loading to avoid N+1 queries
-# - Added database indexes for frequently queried fields
-# - Image optimization reduces file sizes by 60% on average
-# 
-# ### Security Implementation
-# - Authorization through existing JWT token system
-# - Input sanitization prevents XSS attacks
-# - File upload restrictions (size, type, malware scanning)
-# - Rate limiting on upload endpoints
-
-holo progress --from-buffer --summary "Implemented complete user profile system:
-- Full CRUD API with validation and authorization
-- Frontend components for editing and avatar upload
-- S3 integration with image processing pipeline
-- Comprehensive test coverage (100% backend, full frontend)" --name "user_profiles"
-```
-
-### After Fixing Bugs
-```bash
-# Write comprehensive details to buffer first
-# Buffer content example:
-# ## Memory Leak Resolution in Background Job Processing
-# 
-# ### Problem Identification
-# Discovered critical memory leak in background job processing system causing
-# production servers to run out of memory after 6-8 hours of operation.
-# 
-# ### Root Cause Analysis
-# **Investigation Process:**
-# - Used memory profiling tools (ruby-prof, memory_profiler)
-# - Analyzed heap dumps from production servers
-# - Traced object allocation patterns in Sidekiq workers
-# 
-# **Root Cause Found:**
-# - Background jobs (`app/workers/data_processor_worker.rb`) were maintaining
-#   persistent database connections that weren't being properly closed
-# - ActiveRecord connection pool was exhausted, causing new connections
-#   to be created outside the pool
-# - Long-running jobs (data import/export) kept connections alive indefinitely
-# 
-# ### Solution Implementation
-# 
-# #### Connection Pooling Fix
-# - Modified worker base class to ensure proper connection cleanup
-# - Added `ensure` blocks to guarantee connection release
-# - Implemented connection pool monitoring and alerts
-# 
-# #### Code Changes
-# ```ruby
-# # app/workers/base_worker.rb
-# class BaseWorker
-#   include Sidekiq::Worker
-#   
-#   def perform_with_cleanup(*args)
-#     perform(*args)
-#   ensure
-#     ActiveRecord::Base.connection_pool.release_connection
-#   end
-# end
-# ```
-# 
-# #### Monitoring Addition
-# - Added Prometheus metrics for connection pool usage
-# - Set up alerts when pool utilization exceeds 80%
-# - Dashboard showing connection lifecycle and cleanup effectiveness
-# 
-# ### Testing and Validation
-# - **Load testing**: Ran 48-hour stress test with heavy job processing
-# - **Memory monitoring**: Confirmed stable memory usage over time
-# - **Production deployment**: Gradual rollout with monitoring
-# 
-# ### Results
-# - Memory usage stabilized at 400MB (down from 2GB+ before crash)
-# - Zero memory-related crashes in 30 days post-fix
-# - Job processing performance improved by 15% due to better resource management
-
-holo progress --from-buffer --summary "Fixed critical memory leak in background job processing:
-- Identified root cause: database connections not properly released
-- Implemented connection pooling with proper cleanup
-- Added monitoring and alerts for connection pool health
-- Validated with 48-hour load testing, zero crashes in 30 days" --name "memory_leak_fix"
-```
-
-### After Architecture Changes
-```bash
-holo progress "Major architectural refactor splitting monolith into microservices. Created separate services for user management, payment processing, and notification delivery. Implemented API gateway for service communication and added service discovery. Maintained backward compatibility during transition." --summary "Refactored monolithic architecture into microservices with separate user, payment, and notification services, including API gateway and service discovery" --name "microservices_refactor"
-```
-
-### After Research/Exploration
-```bash
-holo progress "Comprehensive research into database migration strategies for large-scale data migration. Evaluated tools, approaches, and risks. Selected incremental migration approach with dual-write pattern. Created detailed migration plan and timeline." --summary "Completed comprehensive research and planning for large-scale database migration, selecting incremental approach with dual-write pattern" --name "db_migration_research"
-```
 
 ## Integration with Other Commands
 

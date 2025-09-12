@@ -5,23 +5,23 @@ require 'pathname'
 module Holocron
   class DocumentationLoader
     def self.framework_guide
-      load_documentation('framework/README.md')
+      prepend_date_header(load_documentation('framework/README.md'))
     end
 
     def self.refreshing_context_guide
-      load_documentation('guides/refreshing-context.md')
+      prepend_date_header(load_documentation('guides/refreshing-context.md'))
     end
 
     def self.creating_long_form_docs_guide
-      load_documentation('guides/creating-long-form-docs.md')
+      prepend_date_header(load_documentation('guides/creating-long-form-docs.md'))
     end
 
     def self.offboarding_guide
-      load_documentation('guides/offboarding.md')
+      prepend_date_header(load_documentation('guides/offboarding.md'))
     end
 
     def self.progress_logging_guide
-      load_documentation('guides/progress-logging.md')
+      prepend_date_header(load_documentation('guides/progress-logging.md'))
     end
 
     private
@@ -31,6 +31,20 @@ module Holocron
       File.read(docs_path)
     rescue Errno::ENOENT
       "Documentation file not found: #{relative_path}"
+    end
+
+    def self.prepend_date_header(content)
+      current_date = Time.now.strftime('%A, %B %d, %Y')
+
+      header = <<~HEADER
+        🗓️  **CURRENT DATE: #{current_date}**
+        ⚠️  **AI ATTENTION**: Use this date for all timestamped file naming (YYYY-MM-DD format: #{Time.now.strftime('%Y-%m-%d')})
+
+        ---
+
+      HEADER
+
+      header + content
     end
 
     def self.gem_root

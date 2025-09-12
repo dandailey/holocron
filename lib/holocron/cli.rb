@@ -46,6 +46,7 @@ module Holocron
 
     desc 'context-refresh', 'Create a new context refresh file'
     option :name, type: :string, desc: 'Custom name for the entry (default: context_refresh)'
+    option :from_buffer, type: :boolean, desc: 'Read content from buffer file instead of using template'
     def context_refresh
       Commands::Context.new(options).new_refresh
     end

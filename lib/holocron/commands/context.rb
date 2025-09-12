@@ -16,67 +16,90 @@ module Holocron
         require_holocron_directory!
 
         timestamp = Time.now.strftime('%Y_%m_%d_%H%M%S')
-        filename = "#{timestamp}_#{@slug}.md"
+        filename = "_PENDING_#{timestamp}_#{@slug}.md"
 
         filepath = File.join(@holocron_directory, '_memory', 'context_refresh', filename)
 
-        # Use template for manual editing
-        content = <<~CONTENT
-          # Context Refresh
+        if options[:from_buffer]
+          # Read content from buffer file
+          buffer_path = File.join(@holocron_directory, '_memory', 'tmp', 'buffer')
 
-          **Date:** #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}
+          unless File.exist?(buffer_path)
+            puts '❌ Buffer file not found!'.colorize(:red)
+            puts 'Write content to _memory/tmp/buffer first, then try again.'.colorize(:yellow)
+            return
+          end
 
-          ## Current Objective
-          <!-- What is the single next thing we intend to deliver? Be specific about the immediate goal and why it matters. -->
+          content = File.read(buffer_path)
 
-          ## Major Accomplishments This Session
-          <!-- List the significant work completed, features implemented, bugs fixed, etc. Be comprehensive. -->
+          if content.strip.empty?
+            puts '❌ Buffer file is empty!'.colorize(:red)
+            puts 'Write content to _memory/tmp/buffer first, then try again.'.colorize(:yellow)
+            return
+          end
+        else
+          # Use template for manual editing
+          content = <<~CONTENT
+            # Context Refresh
 
-          ## Key Decisions Made
-          <!-- Document important architectural, technical, or approach decisions. Include reasoning and impact. -->
+            **Date:** #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}
 
-          ## Architecture & Technical Changes
-          <!-- Describe any structural changes, new patterns, refactoring, or technical debt addressed. -->
+            ## Current Objective
+            <!-- What is the single next thing we intend to deliver? Be specific about the immediate goal and why it matters. -->
 
-          ## Files Currently in Flight
-          <!-- List specific filepaths being worked on, with brief context about what's happening in each. -->
+            ## Major Accomplishments This Session
+            <!-- List the significant work completed, features implemented, bugs fixed, etc. Be comprehensive. -->
 
-          ## Dependencies & Environment
-          <!-- Any new dependencies, version changes, configuration updates, or environment setup changes. -->
+            ## Key Decisions Made
+            <!-- Document important architectural, technical, or approach decisions. Include reasoning and impact. -->
 
-          ## Testing & Quality
-          <!-- Test status, linting results, any quality improvements made. -->
+            ## Architecture & Technical Changes
+            <!-- Describe any structural changes, new patterns, refactoring, or technical debt addressed. -->
 
-          ## Blockers & Unknowns
-          <!-- Anything that could bite future-you, unresolved questions, or areas needing investigation. -->
+            ## Files Currently in Flight
+            <!-- List specific filepaths being worked on, with brief context about what's happening in each. -->
 
-          ## Next Immediate Steps
-          <!-- What should future-you do first? Be specific and actionable. -->
+            ## Dependencies & Environment
+            <!-- Any new dependencies, version changes, configuration updates, or environment setup changes. -->
 
-          ## Future Considerations
-          <!-- Things to keep in mind for upcoming work, potential issues, or strategic decisions ahead. -->
+            ## Testing & Quality
+            <!-- Test status, linting results, any quality improvements made. -->
 
-          ## Context for Handoff
-          <!-- Any additional context that would help future-you understand the current state and momentum. -->
-        CONTENT
+            ## Blockers & Unknowns
+            <!-- Anything that could bite future-you, unresolved questions, or areas needing investigation. -->
+
+            ## Next Immediate Steps
+            <!-- What should future-you do first? Be specific and actionable. -->
+
+            ## Future Considerations
+            <!-- Things to keep in mind for upcoming work, potential issues, or strategic decisions ahead. -->
+
+            ## Context for Handoff
+            <!-- Any additional context that would help future-you understand the current state and momentum. -->
+          CONTENT
+        end
 
         FileUtils.mkdir_p(File.dirname(filepath))
         File.write(filepath, content)
 
         puts "✅ Created context refresh file: #{filepath}".colorize(:green)
-        puts 'Edit the file to add details'.colorize(:yellow)
+        if options[:from_buffer]
+          puts 'Context refresh created from buffer content.'.colorize(:green)
+        else
+          puts 'Edit the file to add details'.colorize(:yellow)
+        end
       end
 
       private
 
       def generate_slug_from_name(name)
-        # Convert name to a URL-friendly slug
+        # Convert name to a filename-safe slug while preserving underscores
         name.downcase
-            .gsub(/[^a-z0-9\s-]/, '')
-            .gsub(/\s+/, '_')
-            .gsub(/-+/, '_')
-            .gsub(/_+/, '_')
-            .gsub(/^_|_$/, '')
+            .gsub(/[^a-z0-9\s_-]/, '')  # Keep underscores and hyphens
+            .gsub(/\s+/, '_')           # Convert spaces to underscores
+            .gsub(/-+/, '_')            # Convert hyphens to underscores
+            .gsub(/_+/, '_')            # Collapse multiple underscores
+            .gsub(/^_|_$/, '')          # Remove leading/trailing underscores
       end
     end
   end

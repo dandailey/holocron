@@ -29,6 +29,8 @@ Every time a new chat session begins with the user:
 - **When asked to update progress:** Run `holo guide progress-logging` for detailed progress logging instructions.
 - **When asked to create context refresh:** Run `holo guide refreshing-context` for context refresh guidance.
 
+**IMPORTANT:** When asked to take any action (offboarding, context refreshing, progress logging, etc.), ALWAYS read the relevant context guide first if one exists and you haven't read it yet. The guides contain specific instructions and best practices that are essential for proper execution.
+
 ## Subsequent Prompts
 
 Every time you take some action, or form a conclusion, have a revelation, or pretty much always... constantly ask yourself how best to record that into your Holocron to persist it across chat sessions.
@@ -170,6 +172,7 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
 **Buffer Integration:** The `--from-buffer` flag works with:
 - `holo progress --from-buffer`
 - `holo suggest --from-buffer`
+- `holo context-refresh --from-buffer`
 
 **Workflow (for AI agents):**
 1. Write content directly to `_memory/tmp/buffer` using your file writing tools/functions
@@ -184,11 +187,12 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
 ### Context Management
 
 **`holo context-refresh`** - Create a context refresh file
-- **What it does:** Creates a timestamped context refresh file ready for immediate use
+- **What it does:** Creates a timestamped context refresh file with proper _PENDING_ prefix
 - **When to use:** When your context window is getting full or you need to hand off work
 - **Parameters:**
   - `--name=NAME`: Custom name for the entry (default: context_refresh)
-- **Example:** `holo context-refresh` or `holo context-refresh --name "feature_complete"`
+  - `--from-buffer`: Read content from buffer file instead of using template
+- **Example:** `holo context-refresh --from-buffer --name "feature_complete"` (preferred) or `holo context-refresh --name "feature_complete"`
 
 **`holo progress [CONTENT]`** - Add a progress log entry
 - **What it does:** Creates a detailed progress log entry and updates the main progress log
@@ -198,7 +202,7 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
   - `--summary=SUMMARY`: Brief summary (auto-generated if not provided)
   - `--name=NAME`: Custom name for the entry (default: progress_update)
   - `--from-buffer`: Read content from buffer file (recommended for longform content)
-- **Example:** `holo progress --from-buffer` or `holo progress "Detailed content here" --summary "Brief summary" --name "feature_name"`
+- **Example:** `holo progress --from-buffer` (preferred) or `holo progress "Detailed content here" --summary "Brief summary" --name "feature_name"`
 
 ### Documentation Commands
 
@@ -239,7 +243,7 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
   - `MESSAGE` (optional): Your suggestion
   - `--open-issue`: Open a GitHub issue (future feature)
   - `--from-buffer`: Read content from buffer file (recommended for longform content)
-- **Example:** `holo suggest --from-buffer` or `holo suggest "Add support for custom templates"`
+- **Example:** `holo suggest --from-buffer` (preferred) or `holo suggest "Add support for custom templates"`
 
 ### Status Commands
 

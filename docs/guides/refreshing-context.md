@@ -23,11 +23,55 @@ holo context-refresh
 holo context-refresh --name "auth_milestone_complete"
 ```
 
-**This single command handles everything automatically:**
+**With buffer content (for AI agents):**
+```bash
+# 1. Write comprehensive context refresh content to buffer file
+# File location: _memory/tmp/buffer
+# Content should include all sections below
+
+# 2. Create context refresh from buffer
+holo context-refresh --from-buffer --name "descriptive_name"
+
+# 3. Clear buffer when done: holo buffer clear
+```
+
+**This command automatically:**
 - Creates context refresh file in `_memory/context_refresh/`
+- Uses proper `_PENDING_` prefix for automated processing
+- Preserves underscores in names (makes them filename-safe)
 - Uses timestamped filename (YYYY_MM_DD_HHMMSS format)
-- Provides comprehensive template with all necessary sections
-- Ready for immediate editing with your preferred editor
+- Provides comprehensive template or uses buffer content
+
+## Context Refresh Template
+
+When creating a context refresh, use this comprehensive template:
+
+```markdown
+# Context Refresh - [Date]
+
+## Current State
+- [What has been completed/accomplished]
+- [Current system status]
+- [What's working and what's not]
+- [Key files and their locations]
+
+## Next Steps
+- [Immediate next tasks to work on]
+- [Priority order for upcoming work]
+- [Dependencies that need to be resolved]
+
+## Important Notes
+- [Key technical decisions made]
+- [Files that were modified and why]
+- [Configuration changes or environment setup]
+- [References to other documentation (decision logs, etc.)]
+
+## Context for Next Session
+- [What the next AI should focus on first]
+- [Any warnings or gotchas to be aware of]
+- [Resources or documentation to reference]
+- [Current blockers or issues to address]
+```
 
 ## Example Context Refresh
 
@@ -51,9 +95,6 @@ holo context-refresh --name "auth_milestone_complete"
 ```
 
 ## Loading Context
-
-### Manual Loading
-When starting a new session, check for context refresh files in `_memory/context_refresh/` and read the most recent one to get up to speed.
 
 ### Automated Loading
 Use `holo onboard` to automatically:

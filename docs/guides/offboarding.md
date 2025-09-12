@@ -16,10 +16,14 @@ Document what was accomplished using the progress logging system:
 
 **For complex content (recommended):** 
 ```bash
-# Write detailed content to buffer
-echo "## Major Accomplishments
-[detailed content...]" > _memory/tmp/buffer
-holo progress "Summary" --from-buffer
+# AI agents: Write detailed content directly to buffer file using file writing tools
+# File location: _memory/tmp/buffer
+# Content example:
+# ## Major Accomplishments
+# [detailed content...]
+# 
+# Then use:
+holo progress --from-buffer --summary "Summary" --name "descriptive_name"
 ```
 
 **The CLI command handles everything automatically:**
@@ -104,15 +108,26 @@ Before finishing, verify:
 
 ### Progress Log Command
 ```bash
+# Preferred method (for complex content):
+holo progress --from-buffer --summary "Summary" --name "descriptive_name"
+
+# Alternative method (for simple content):
 holo progress "Full content here" --summary "Summary" --name "slug_name"
 ```
 **This handles everything automatically** - creates detailed log file and updates main progress log.
 
 ### Context Refresh Command
 ```bash
+# Preferred method (for AI agents):
+# 1. Write content to _memory/tmp/buffer using file writing tools
+# 2. Create context refresh from buffer:
+holo context-refresh --from-buffer --name "descriptive_name"
+# 3. Clear buffer: holo buffer clear
+
+# Alternative method (with template):
 holo context-refresh --name "reason"
 ```
-**This handles everything automatically** - creates properly named file with your content, no manual editing needed.
+**Note:** The --from-buffer method provides better control over content formatting and uses the proper _PENDING_ prefix.
 
 ### Other Useful Commands
 ```bash
