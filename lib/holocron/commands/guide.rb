@@ -21,12 +21,15 @@ module Holocron
           puts Holocron::DocumentationLoader.offboarding_guide.colorize(:blue)
         when 'progress-logging'
           puts Holocron::DocumentationLoader.progress_logging_guide.colorize(:blue)
+        when 'notebooks'
+          puts Holocron::DocumentationLoader.notebooks_guide.colorize(:blue)
         else
           puts 'Available guides:'.colorize(:yellow)
           puts '  - refreshing-context'
           puts '  - creating-long-form-docs'
           puts '  - offboarding'
           puts '  - progress-logging'
+          puts '  - notebooks'
           puts ''
           puts 'Usage: holo guide <guide-name>'.colorize(:green)
         end

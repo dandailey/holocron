@@ -184,6 +184,24 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
 
 **Why use buffer?** Avoids CLI argument length limits and shell escaping issues with complex markdown content containing quotes, newlines, and special characters.
 
+### Research Notebooks
+
+**`holo notebook`** - Systematic knowledge extraction and research
+- **What it does:** Enables systematic mining and consolidation of information from across an entire holocron on specific topics
+- **When to use:** When you need to research a topic across many files, especially in large holocrons (50+ files)
+- **Key features:**
+  - Creates research notebooks with comprehensive source listings
+  - Tracks progress across multiple AI sessions
+  - Provides file metadata (size, date, type) for intelligent batching
+  - Generates proper citations and timestamps
+- **Commands:**
+  - `holo notebook new --from-buffer --name <name>` - Create new research notebook
+  - `holo notebook status <name>` - Show progress and sources
+  - `holo notebook add-entry <name> <file-id> <content>` - Add research entry
+  - `holo notebook mark-source <name> <file-id>` - Toggle source completion status
+  - `holo notebook list` - List all notebooks with progress
+- **For detailed guidance:** Run `holo guide notebooks` for comprehensive research strategies and batching techniques
+
 ### Context Management
 
 **`holo context-refresh`** - Create a context refresh file

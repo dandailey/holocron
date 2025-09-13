@@ -15,6 +15,7 @@ require 'holocron/commands/onboard'
 require 'holocron/commands/progress'
 require 'holocron/commands/status'
 require 'holocron/commands/buffer'
+require 'holocron/commands/notebook'
 require 'holocron/holocron_finder'
 
 module Holocron
@@ -95,6 +96,19 @@ module Holocron
     desc 'buffer [ACTION]', 'Manage buffer file for longform content'
     def buffer(action = nil)
       Commands::Buffer.new(action, options).call
+    end
+
+    desc 'notebook [ACTION] [NAME] [FILE_ID] [CONTENT]', 'Manage research notebooks for systematic knowledge extraction'
+    option :from_buffer, type: :boolean, desc: 'Read content from buffer file instead of CONTENT argument'
+    option :name, type: :string, desc: 'Notebook name (for new command)'
+    def notebook(action = nil, name = nil, file_id = nil, content = nil)
+      # Handle --name option for new command
+      name = options[:name] if options[:name]
+
+      # Handle --from-buffer for content
+      content = '--from-buffer' if options[:from_buffer] && content.nil?
+
+      Commands::Notebook.new(action, name, file_id, content, options).call
     end
 
     def self.exit_on_failure?

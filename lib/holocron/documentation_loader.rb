@@ -24,6 +24,10 @@ module Holocron
       prepend_date_header(load_documentation('guides/progress-logging.md'))
     end
 
+    def self.notebooks_guide
+      prepend_date_header(load_documentation('guides/notebooks.md'))
+    end
+
     private
 
     def self.load_documentation(relative_path)

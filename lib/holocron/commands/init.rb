@@ -37,6 +37,7 @@ module Holocron
           _memory/progress_logs
           _memory/context_refresh
           _memory/knowledge_base
+          _memory/notebooks
           _memory/tmp
           longform_docs
           files
