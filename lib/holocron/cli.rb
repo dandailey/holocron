@@ -16,6 +16,7 @@ require 'holocron/commands/progress'
 require 'holocron/commands/status'
 require 'holocron/commands/buffer'
 require 'holocron/commands/notebook'
+require 'holocron/commands/server'
 require 'holocron/holocron_finder'
 
 module Holocron
@@ -110,6 +111,30 @@ module Holocron
       content = '--from-buffer' if options[:from_buffer] && content.nil?
 
       Commands::Notebook.new(action, name, file_id, content, options).call
+    end
+
+    desc 'server [ACTION]', 'Start or manage the Holocron web server'
+    option :port, type: :numeric, default: 4567, desc: 'Port to run the server on'
+    option :host, type: :string, default: 'localhost', desc: 'Host to bind the server to'
+    def server(action = 'start')
+      if action == '--help' || action == 'help'
+        puts "Holocron Server Commands:"
+        puts "  holo server start    - Start the web server"
+        puts "  holo server stop     - Stop the web server (not implemented)"
+        puts "  holo server status   - Show server status (not implemented)"
+        puts ""
+        puts "Options:"
+        puts "  --port PORT          - Port to run on (default: 4567)"
+        puts "  --host HOST          - Host to bind to (default: localhost)"
+        puts ""
+        puts "Examples:"
+        puts "  holo server start"
+        puts "  holo server start --port 3000"
+        puts "  holo server start --host 0.0.0.0 --port 8080"
+        return
+      end
+      
+      Commands::Server.new(action, options).call
     end
 
     def self.exit_on_failure?
