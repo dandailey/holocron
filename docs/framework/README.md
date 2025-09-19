@@ -25,7 +25,7 @@ Every time a new chat session begins with the user:
 - Also read any other files in the root level of your Holocron
 - You read any other files any of those files tell you to read, and do anything any of those read files tell you to do.
 - Check to see if you need to reload your context! Run `holo guide refreshing-context` for more information.
-- **When asked to offboard:** Run `holo guide offboarding` for the complete offboarding process.
+- **When asked to offboard:** Run `holo guide offboarding` for the complete offboarding process. This is essential for proper session handoffs!
 - **When asked to update progress:** Run `holo guide progress-logging` for detailed progress logging instructions.
 - **When asked to create context refresh:** Run `holo guide refreshing-context` for context refresh guidance.
 
@@ -128,6 +128,13 @@ Questions you should ask yourself (EVERY TIME):
 - `holo help <command>` - Show detailed help for a specific command
 
 **Important:** Do not use `--help` flags (e.g., `holo init --help`) as they are treated as command arguments, not help requests.
+
+**Essential Guides:**
+- `holo guide offboarding` - Complete offboarding process for session handoffs
+- `holo guide progress-logging` - How to document your work
+- `holo guide refreshing-context` - How to create context refreshes
+- `holo guide creating-long-form-docs` - How to create complex documentation
+- `holo guide notebooks` - Research and knowledge extraction workflows
 
 ## Holocron Commands
 

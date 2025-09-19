@@ -70,7 +70,8 @@ module Holocron
       Commands::Framework.new.call
     end
 
-    desc 'guide [GUIDE_NAME]', 'Display a specific Holocron guide'
+    desc 'guide [GUIDE_NAME]',
+         'Display a specific Holocron guide (available: refreshing-context, creating-long-form-docs, offboarding, progress-logging, notebooks)'
     def guide(guide_name = nil)
       Commands::Guide.new(guide_name, options).call
     end

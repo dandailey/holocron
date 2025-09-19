@@ -48,7 +48,8 @@ module Holocron
 
       HEADER
 
-      header + content
+      # Ensure both strings are UTF-8 encoded before concatenation
+      header.force_encoding('UTF-8') + content.force_encoding('UTF-8')
     end
 
     def self.gem_root
