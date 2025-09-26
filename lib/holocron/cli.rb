@@ -122,21 +122,13 @@ module Holocron
     desc 'server [ACTION]', 'Start or manage the Holocron web server'
     option :port, type: :numeric, default: 4567, desc: 'Port to run the server on'
     option :host, type: :string, default: 'localhost', desc: 'Host to bind the server to'
+    option :background, type: :boolean, default: false, desc: 'Run server in background'
     def server(action = 'start')
-      if ['--help', 'help'].include?(action)
-        puts 'Holocron Server Commands:'
-        puts '  holo server start    - Start the web server'
-        puts '  holo server stop     - Stop the web server (not implemented)'
-        puts '  holo server status   - Show server status (not implemented)'
-        puts ''
-        puts 'Options:'
-        puts '  --port PORT          - Port to run on (default: 4567)'
-        puts '  --host HOST          - Host to bind to (default: localhost)'
-        puts ''
-        puts 'Examples:'
-        puts '  holo server start'
-        puts '  holo server start --port 3000'
-        puts '  holo server start --host 0.0.0.0 --port 8080'
+      # Handle restart action
+      if action == 'restart'
+        Commands::Server.new('stop', options).call
+        sleep 1
+        Commands::Server.new('start', options).call
         return
       end
 
@@ -183,7 +175,14 @@ module Holocron
       shell.say '  holo framework                    Show framework guide'
       shell.say '  holo guide [GUIDE_NAME]           Show a specific guide'
       shell.say '  holo onboard                      Framework guide + process refreshes'
-      shell.say '  holo server [ACTION]              Manage web server (start/status)'
+      shell.say "\n"
+
+      shell.say 'Web Server Management:', :green
+      shell.say '  holo server start                 Start web server (foreground)'
+      shell.say '  holo server start --background   Start web server in background'
+      shell.say '  holo server stop                  Stop background server'
+      shell.say '  holo server status                Show server status and info'
+      shell.say '  holo server restart               Restart server'
       shell.say "\n"
 
       shell.say 'Registry (manage holos globally):', :green

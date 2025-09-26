@@ -257,7 +257,7 @@ For full details, run `holo guide registry`.
 - **When to use:** When you need detailed instructions for specific workflows
 - **Parameters:**
   - `GUIDE_NAME` (optional): Name of the guide to display
-- **Available guides:** `refreshing-context`, `creating-long-form-docs`, `offboarding`, `progress-logging`
+- **Available guides:** `refreshing-context`, `creating-long-form-docs`, `offboarding`, `progress-logging`, `server`
 - **Example:** `holo guide progress-logging`
 
 **`holo longform concat DIRECTORY`** - Concatenate longform documentation

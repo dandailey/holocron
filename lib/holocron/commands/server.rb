@@ -16,6 +16,8 @@ module Holocron
         @action = action
         @port = options[:port] || 4567
         @host = options[:host] || 'localhost'
+        @background = options[:background] || false
+        @pid_file = File.expand_path('~/.holocron_server.pid')
       end
 
       def call
@@ -36,9 +38,24 @@ module Holocron
       private
 
       def start_server
+        # Check if server is already running
+        if server_running?
+          puts "⚠️  Server is already running (PID: #{read_pid})"
+          puts "   Use 'holo server stop' to stop it first"
+          return
+        end
+
         # Load registry
         @registry = Registry.load
 
+        if @background
+          start_background_server
+        else
+          start_foreground_server
+        end
+      end
+
+      def start_foreground_server
         puts '🚀 Starting Holocron server...'
         puts "🌐 Server running at: http://#{@host}:#{@port}"
         puts '📋 Registered Holocrons:'
@@ -61,52 +78,171 @@ module Holocron
         puts '   POST     /v1/{holo-name}/ops/bundle         - Bundle multiple files'
         puts ''
         puts 'Press Ctrl+C to stop the server'
+        start_webrick_server
+      end
 
-        begin
-          puts '🔄 Starting WEBrick server...'
-          server = WEBrick::HTTPServer.new(Port: @port, Host: @host)
-
-          # Add signal handling
-          trap('INT') { server.shutdown }
-
-          # Enable DELETE method for proc handlers
-          WEBrick::HTTPServlet::ProcHandler.class_eval do
-            def do_DELETE(req, res)
-              @proc.call(req, res)
-            end
-
-            def do_PUT(req, res)
-              @proc.call(req, res)
-            end
-          end
-
-          # Mount registry endpoint
-          server.mount_proc('/v1/holocrons') { |req, res| handle_holocrons(req, res) }
-          server.mount_proc('/v1/help') { |req, res| handle_help(req, res, nil) }
-
-          # Mount dynamic Holocron endpoints with all HTTP methods
-          server.mount_proc('/v1/') { |req, res| handle_holocron_request(req, res) }
-
-          puts '✅ Server started successfully'
-          server.start
-        rescue StandardError => e
-          puts "❌ Error starting server: #{e.message}"
-          puts e.backtrace.first(5)
-          exit 1
-        rescue Interrupt
-          puts "\n🛑 Server stopped"
-        end
+      def start_background_server
+        puts '🚀 Background Server Mode'
+        puts ''
+        puts '⚠️  Built-in background mode is not supported due to Ruby process management complexity.'
+        puts '   Instead, use one of these reliable approaches:'
+        puts ''
+        puts '   🎯 Recommended - Using nohup:'
+        puts "   nohup holo server start --port=#{@port} --host=#{@host} > ~/.holocron_server.log 2>&1 &"
+        puts ''
+        puts '   📺 Using screen/tmux:'
+        puts '   screen -S holocron-server holo server start'
+        puts '   # Then detach with Ctrl+A, D'
+        puts ''
+        puts '   🪟 Separate terminal:'
+        puts "   holo server start --port=#{@port} --host=#{@host}"
+        puts ''
+        puts '✅ All approaches support proper shutdown with: holo server stop'
+        puts '📝 Logs will be written to: ~/.holocron_server.log'
       end
 
       def stop_server
-        puts 'Server stop not implemented yet (use Ctrl+C to stop running server)'
+        unless server_running?
+          puts 'ℹ️  No server is currently running'
+          return
+        end
+
+        pid = read_pid
+        puts "🛑 Stopping server (PID: #{pid})..."
+
+        begin
+          Process.kill('TERM', pid)
+          # Wait for graceful shutdown
+          sleep 2
+
+          if server_running?
+            puts "⚠️  Server didn't stop gracefully, forcing..."
+            Process.kill('KILL', pid)
+            sleep 1
+          end
+
+          File.delete(@pid_file) if File.exist?(@pid_file)
+          puts '✅ Server stopped successfully'
+        rescue Errno::ESRCH
+          puts 'ℹ️  Server was not running'
+          File.delete(@pid_file) if File.exist?(@pid_file)
+        rescue StandardError => e
+          puts "❌ Error stopping server: #{e.message}"
+        end
       end
 
       def show_status
-        puts 'Server status not implemented yet'
+        if server_running?
+          pid = read_pid
+          puts "✅ Server is running (PID: #{pid})"
+          puts "🌐 Server URL: http://#{@host}:#{@port}"
+          puts '📝 Logs: ~/.holocron_server.log'
+          puts "📁 PID file: #{@pid_file}"
+
+          # Show uptime
+          begin
+            process = `ps -p #{pid} -o etime=`.strip
+            puts "⏱️  Uptime: #{process}" unless process.empty?
+          rescue StandardError
+            # Ignore errors getting uptime
+          end
+
+          # Test server connectivity
+          puts "\n🔍 Testing server connectivity..."
+          begin
+            require 'net/http'
+            require 'uri'
+            uri = URI("http://#{@host}:#{@port}/v1/help")
+            response = Net::HTTP.get_response(uri)
+            if response.code == '200'
+              puts '✅ Server is responding to requests'
+            else
+              puts "⚠️  Server is running but not responding properly (HTTP #{response.code})"
+            end
+          rescue StandardError => e
+            puts "❌ Server is not responding: #{e.message}"
+          end
+
+          # Show registered holocrons
+          puts "\n📋 Registered Holocrons:"
+          begin
+            @registry = Registry.load
+            if @registry.all.any?
+              @registry.all.each do |holo|
+                status = holo[:active] ? ' (active)' : ''
+                puts "   #{holo[:name]}: #{holo[:description] || 'No description'}#{status}"
+              end
+            else
+              puts '   No holocrons registered'
+            end
+          rescue StandardError => e
+            puts "   Error loading registry: #{e.message}"
+          end
+
+        else
+          puts '❌ Server is not running'
+          puts "📁 PID file: #{@pid_file}"
+          puts '⚠️  Stale PID file found - you may want to clean it up' if File.exist?(@pid_file)
+        end
       end
 
-      def handle_holocrons(req, res)
+      def start_webrick_server
+        server = WEBrick::HTTPServer.new(Port: @port, Host: @host)
+
+        # Add signal handling
+        trap('INT') { server.shutdown }
+
+        # Enable DELETE and PUT methods for proc handlers
+        WEBrick::HTTPServlet::ProcHandler.class_eval do
+          def do_DELETE(req, res)
+            @proc.call(req, res)
+          end
+
+          def do_PUT(req, res)
+            @proc.call(req, res)
+          end
+        end
+
+        # Mount registry endpoint
+        server.mount_proc('/v1/holocrons') { |req, res| handle_holocrons(req, res) }
+        server.mount_proc('/v1/help') { |req, res| handle_help(req, res, nil) }
+
+        # Mount dynamic Holocron endpoints with all HTTP methods
+        server.mount_proc('/v1/') { |req, res| handle_holocron_request(req, res) }
+
+        puts '✅ Server started successfully'
+        server.start
+      rescue StandardError => e
+        puts "❌ Error starting server: #{e.message}"
+        puts e.backtrace.first(5)
+        exit 1
+      rescue Interrupt
+        puts "\n🛑 Server stopped"
+      end
+
+      def server_running?
+        return false unless File.exist?(@pid_file)
+
+        pid = read_pid
+        return false unless pid
+
+        Process.kill(0, pid)
+        true
+      rescue Errno::ESRCH, Errno::ENOENT
+        false
+      end
+
+      def read_pid
+        return nil unless File.exist?(@pid_file)
+
+        File.read(@pid_file).strip.to_i
+      end
+
+      def write_pid(pid)
+        File.write(@pid_file, pid.to_s)
+      end
+
+      def handle_holocrons(_req, res)
         res.content_type = 'application/json'
         res.body = JSON.generate(@registry.to_hash)
       end
@@ -159,7 +295,7 @@ module Holocron
         not_found(res)
       end
 
-      def handle_help(req, res, holo)
+      def handle_help(_req, res, holo)
         res.content_type = 'text/markdown'
         name = holo ? holo[:name] : '{holo}'
         ops_base = "/v1/#{name}/ops"
@@ -247,6 +383,18 @@ module Holocron
           - Method: POST `#{ops_base}/bundle`
           - Body: `paths[]` or file filters, `max_total_bytes` (default 1_000_000)
 
+          ### apply_diff
+          - Method: POST `#{ops_base}/apply_diff`
+          - Purpose: Apply git-style unified diff to multiple files atomically
+          - Body: `{ diff: "unified diff content", author?, message? }`
+          - Returns: `{ applied: bool, summary: { total_files, created, modified, deleted, hunks_applied, errors }, results: [...] }`
+          - Example:
+            ```bash
+            curl -s -X POST -H "Content-Type: application/json" \
+              -d '{"diff":"--- a/_memory/progress_logs/new.md\n+++ b/_memory/progress_logs/new.md\n@@ -0,0 +1,5 @@\n+# New Entry\n+Content here"}' \
+              "#{ops_base}/apply_diff"
+            ```
+
           ## Safety & Sandbox
           - All paths are sandboxed within the Holocron root; traversal outside is prevented.
           - Precondition writes via `if_match_sha256` prevent accidental overwrites.
@@ -257,7 +405,7 @@ module Holocron
         res.body = md
       end
 
-      def handle_status(req, res, holo)
+      def handle_status(_req, res, holo)
         res.body = JSON.generate({
                                    name: holo[:name],
                                    path: holo[:path],
