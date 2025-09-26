@@ -149,13 +149,23 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
 - **Parameters:** None
 - **Example:** `holo onboard`
 
-**`holo init [DIRECTORY]`** - Initialize a new Holocron
-- **What it does:** Creates a complete Holocron structure in the specified directory
+**Registry quickstart (global management)**
+- `holo list` — List registered holocrons (marks active/default)
+- `holo select <name>` — Select which holocron commands act upon
+- `holo init <name> <dir>` — Create and register a holocron
+- `holo register <name> <dir>` — Register an existing holocron
+- `holo forget <name>` — Remove a holocron from the registry
+
+For full details, run `holo guide registry`.
+
+**`holo init <NAME> <DIRECTORY>`** - Initialize a new Holocron and register it
+- **What it does:** Creates a complete Holocron structure and registers it by name
 - **When to use:** When starting a new project or adding Holocron to an existing project
 - **Parameters:** 
-  - `DIRECTORY` (optional): Where to create the Holocron (default: current directory)
+  - `NAME`: Registry name
+  - `DIRECTORY`: Where to create the Holocron
   - `--into=DIR`: Alternative way to specify directory
-- **Example:** `holo init my-project` or `holo init .`
+- **Example:** `holo init my-project ./my-project`
 
 **`holo doctor [DIRECTORY]`** - Validate Holocron structure
 - **What it does:** Checks for common issues and validates your Holocron structure
@@ -236,6 +246,11 @@ The `holo` command provides all the tools you need to manage your Holocron. **No
 - **When to use:** When you need to reference the framework (or use `holo onboard` instead)
 - **Parameters:** None
 - **Example:** `holo framework`
+
+**Server overview**
+- `holo server start` — Launch local web service exposing Holocron APIs
+- Endpoints under `/v1/` for registry, status, and operations
+- See `holo guide server` for complete usage, endpoints, and examples
 
 **`holo guide [GUIDE_NAME]`** - Display a specific guide
 - **What it does:** Shows documentation for specific Holocron features

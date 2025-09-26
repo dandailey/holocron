@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'holocron/holocron_finder'
+require 'holocron/registry'
 
 module Holocron
   module Commands
@@ -21,10 +22,12 @@ module Holocron
       def require_holocron_directory!
         return if @holocron_directory
 
-        puts '❌ No holocron directory found!'.colorize(:red)
+        puts '❌ No holocron selected or found!'.colorize(:red)
         puts
-        puts 'Holocron commands need to be run from within a holocron directory or you can specify one:'.colorize(:yellow)
+        puts 'Holocron commands need an active selection, a valid directory, or you can specify one:'.colorize(:yellow)
         puts
+        puts '  holo select <name>            # use a registered holocron'.colorize(:cyan)
+        puts '  holo list                     # see registered holocrons'.colorize(:cyan)
         puts '  holo [command] --dir /path/to/holocron'.colorize(:cyan)
         puts '  holo [command] --dir .holocron/sync'.colorize(:cyan)
         puts
@@ -34,7 +37,7 @@ module Holocron
         puts 'Current directory: '.colorize(:yellow) + File.expand_path('.')
         puts
         puts 'To create a new holocron, run:'.colorize(:green)
-        puts '  holo init [DIRECTORY]'.colorize(:cyan)
+        puts '  holo init <name> <directory>'.colorize(:cyan)
         puts
         exit 1
       end

@@ -21,7 +21,7 @@ module Holocron
 
       data = YAML.load_file(REGISTRY_FILE)
       @default = data['default']
-      
+
       data['holocrons']&.each do |holo|
         @holocrons[holo['name']] = {
           name: holo['name'],
@@ -32,7 +32,7 @@ module Holocron
       end
 
       self
-    rescue => e
+    rescue StandardError => e
       puts "Warning: Failed to load registry: #{e.message}"
       self
     end
@@ -60,7 +60,7 @@ module Holocron
     def valid_path?(name)
       holo = get(name)
       return false unless holo
-      
+
       File.exist?(File.join(holo[:path], '_memory'))
     end
 
@@ -73,6 +73,60 @@ module Holocron
         default: @default,
         holocrons: @holocrons.values
       }
+    end
+
+    # Persist current registry state to disk
+    def save
+      FileUtils.mkdir_p(File.dirname(REGISTRY_FILE))
+      File.write(REGISTRY_FILE, to_hash.to_yaml)
+      self
+    end
+
+    # Register or update a holocron entry
+    # attrs: { name:, path:, description: nil }
+    def add(attrs)
+      name = attrs[:name] || attrs['name']
+      path = attrs[:path] || attrs['path']
+      description = attrs[:description] || attrs['description']
+
+      raise ArgumentError, 'name is required' unless name && !name.strip.empty?
+      raise ArgumentError, 'path is required' unless path && !path.strip.empty?
+
+      @holocrons[name] = {
+        name: name,
+        path: File.expand_path(path),
+        description: description,
+        active: false
+      }
+
+      self
+    end
+
+    # Remove a holocron by name
+    def remove(name)
+      return self unless @holocrons.key?(name)
+
+      @holocrons.delete(name)
+      @default = nil if @default == name
+      self
+    end
+
+    # Mark a holocron as active (selected) and deactivate others
+    def select(name)
+      raise ArgumentError, "Unknown holocron: #{name}" unless @holocrons.key?(name)
+
+      @holocrons.each_value { |h| h[:active] = false }
+      @holocrons[name][:active] = true
+      @default ||= name
+      self
+    end
+
+    # Set the default holocron name (does not change active)
+    def set_default(name)
+      raise ArgumentError, "Unknown holocron: #{name}" unless @holocrons.key?(name)
+
+      @default = name
+      self
     end
   end
 end

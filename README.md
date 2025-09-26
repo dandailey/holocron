@@ -10,15 +10,26 @@ Holocron solves the fundamental problem of AI assistants having no memory betwee
 # Install the gem
 gem install holocron
 
-# Initialize a new project
-holo init my-awesome-project
+# Initialize a new project (name + directory)
+holo init my-awesome-project ./my-awesome-project
 
-# Validate your setup
-holo doctor my-awesome-project
+# Registering is automatic; select it to work from anywhere
+holo list
+holo select my-awesome-project
+
+# Validate your setup (now uses selected holo if not in directory)
+holo doctor
 
 # Get help
 holo help                    # Show all commands
-holo help init              # Show help for specific command
+holo help init               # Show help for specific command
+```
+
+You can also register an existing holo or forget one:
+
+```bash
+holo register archived ./archived-holo
+holo forget archived
 ```
 
 ## What is Holocron?
@@ -57,16 +68,19 @@ Holocron is like the VHS tape from "50 First Dates" - every session, you read it
 
 ## Basic Usage
 
-### Initialize a Project
+### Initialize and Select a Project
 ```bash
-holo init my-project
-# Creates complete Holocron structure with all necessary files
+holo init my-project ./my-project
+# Creates complete Holocron structure and registers it by name
+
+holo select my-project
+# Selects the holo so other commands can run from anywhere
 ```
 
 ### Validate Structure
 ```bash
-holo doctor my-project
-# Checks for common issues and validates structure
+holo doctor
+# Checks the currently selected holo for common issues and validates structure
 ```
 
 ### Create Context Refresh

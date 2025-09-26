@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'colorize'
+require 'holocron/registry'
 
 module Holocron
   class HolocronFinder
@@ -20,7 +21,14 @@ module Holocron
       finder = new(start_dir)
       holocron_dir = finder.auto_discover
 
+      # Fallback to active selection in registry when auto-discovery fails
       unless holocron_dir
+        registry = Holocron::Registry.load
+        if (active = registry.active)
+          path = active[:path]
+          return path if valid_holocron_directory?(path)
+        end
+
         finder.show_discovery_help
         return nil
       end

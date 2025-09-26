@@ -7,6 +7,10 @@ Complete documentation for all Holocron CLI commands.
 Holocron provides a simple CLI with the following commands:
 
 - `holo init` - Initialize a new Holocron
+- `holo list` - List registered holocrons
+- `holo select <name>` - Select an active holocron to run commands against
+- `holo register <name> <directory>` - Register an existing holocron
+- `holo forget <name>` - Remove a holocron from the registry
 - `holo doctor` - Validate Holocron structure
 - `holo version` - Show version information
 - `holo context-refresh` - Create context refresh files
@@ -29,13 +33,13 @@ All commands support these global options:
 
 ## Commands
 
-### `holo init [DIRECTORY]`
+### `holo init NAME DIRECTORY`
 
-Initialize a new Holocron in the specified directory.
+Initialize a new Holocron with the given name in the specified directory, and register it for global access.
 
 **Usage:**
 ```bash
-holo init [DIRECTORY]
+holo init <name> <directory>
 ```
 
 **Options:**
@@ -43,20 +47,17 @@ holo init [DIRECTORY]
 
 **Examples:**
 ```bash
-# Create Holocron in current directory
-holo init
-
-# Create Holocron in specific directory
-holo init my-project
+# Create Holocron in specific directory with name
+holo init my-project ./my-project
 
 # Create Holocron in custom location
-holo init --into docs/holocron
+holo init docs-holo ./docs/holocron
 ```
 
 **What it creates:**
 - Complete directory structure (`_memory/`, `longform_docs/`, `files/`)
 - All required files (`README.md`, `action_plan.md`, etc.)
-- Placeholder content for immediate use
+- Registers the holocron under the given name in `~/.holocron.yml`
 
 ### `holo doctor [DIRECTORY]`
 
@@ -72,11 +73,11 @@ holo doctor [DIRECTORY]
 
 **Examples:**
 ```bash
-# Check current directory
+# Check currently selected holo
 holo doctor
 
-# Check specific directory
-holo doctor my-project
+# Check specific directory (overrides selection)
+holo doctor /path/to/holocron
 
 # Try to fix issues
 holo doctor --fix my-project
@@ -234,7 +235,7 @@ holo status [DIRECTORY]
 
 **Examples:**
 ```bash
-# Check current directory
+# Check selected holo
 holo status
 
 # Check specific directory
@@ -346,11 +347,11 @@ holo contribute
 ### Complete Workflow
 
 ```bash
-# Initialize a new project
-holo init my-awesome-project
-cd my-awesome-project
+# Initialize a new project and select it
+holo init my-awesome-project ./my-awesome-project
+holo select my-awesome-project
 
-# Validate setup
+# Validate setup from anywhere
 holo doctor
 
 # Create context refresh

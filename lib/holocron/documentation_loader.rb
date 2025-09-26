@@ -28,6 +28,14 @@ module Holocron
       prepend_date_header(load_documentation('guides/notebooks.md'))
     end
 
+    def self.registry_guide
+      prepend_date_header(load_documentation('guides/registry.md'))
+    end
+
+    def self.server_guide
+      prepend_date_header(load_documentation('guides/server.md'))
+    end
+
     private
 
     def self.load_documentation(relative_path)

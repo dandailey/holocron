@@ -23,6 +23,10 @@ module Holocron
           puts Holocron::DocumentationLoader.progress_logging_guide.colorize(:blue)
         when 'notebooks'
           puts Holocron::DocumentationLoader.notebooks_guide.colorize(:blue)
+        when 'registry'
+          puts Holocron::DocumentationLoader.registry_guide.colorize(:blue)
+        when 'server'
+          puts Holocron::DocumentationLoader.server_guide.colorize(:blue)
         else
           puts 'Available guides:'.colorize(:yellow)
           puts '  - refreshing-context'
@@ -30,6 +34,8 @@ module Holocron
           puts '  - offboarding'
           puts '  - progress-logging'
           puts '  - notebooks'
+          puts '  - registry'
+          puts '  - server'
           puts ''
           puts 'Usage: holo guide <guide-name>'.colorize(:green)
         end

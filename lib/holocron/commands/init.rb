@@ -3,26 +3,31 @@
 require 'fileutils'
 require 'colorize'
 require 'holocron/template_manager'
+require 'holocron/registry'
 
 module Holocron
   module Commands
     class Init
-      def initialize(directory, options)
+      def initialize(name, directory, options)
+        @name = name
         @directory = directory || options[:into]
         @options = options
       end
 
       def call
-        puts "Initializing Holocron in #{@directory}...".colorize(:blue)
+        puts "Initializing Holocron '#{@name}' in #{@directory}...".colorize(:blue)
 
         create_directory_structure
         create_buffer_file
         copy_templates
 
+        register_holocron
+
         puts '✅ Holocron initialized successfully!'.colorize(:green)
         puts 'Next steps:'.colorize(:yellow)
         puts '  - Read the README.md to understand the framework'
         puts '  - Customize the files for your project'
+        puts "  - Run 'holo select #{@name}' to select it"
         puts "  - Run 'holo doctor' to validate your setup"
         puts "  - Run 'holo status' to see holocron information"
       end
@@ -53,6 +58,13 @@ module Holocron
 
       def copy_templates
         TemplateManager.new(@directory).copy_templates
+      end
+
+      def register_holocron
+        registry = Holocron::Registry.load
+        registry.add(name: @name, path: File.expand_path(@directory))
+        registry.set_default(@name) unless registry.default
+        registry.save
       end
     end
   end
