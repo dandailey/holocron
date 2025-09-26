@@ -20,14 +20,20 @@ module Holocron
       return self unless File.exist?(REGISTRY_FILE)
 
       data = YAML.load_file(REGISTRY_FILE)
-      @default = data['default']
+      @default = data['default'] || data[:default]
 
-      data['holocrons']&.each do |holo|
-        @holocrons[holo['name']] = {
-          name: holo['name'],
-          path: holo['path'],
-          description: holo['description'],
-          active: holo['active'] || false
+      holocrons_data = data['holocrons'] || data[:holocrons]
+      holocrons_data&.each do |holo|
+        name = holo['name'] || holo[:name]
+        path = holo['path'] || holo[:path]
+        description = holo['description'] || holo[:description]
+        active = holo['active'] || holo[:active] || false
+
+        @holocrons[name] = {
+          name: name,
+          path: path,
+          description: description,
+          active: active
         }
       end
 
