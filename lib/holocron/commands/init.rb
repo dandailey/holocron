@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'colorize'
+require 'json'
 require 'holocron/template_manager'
 require 'holocron/registry'
 
@@ -19,6 +20,7 @@ module Holocron
 
         create_directory_structure
         create_buffer_file
+        create_holocron_json
         copy_templates
 
         register_holocron
@@ -38,12 +40,13 @@ module Holocron
         base_path = File.join(@directory)
         FileUtils.mkdir_p(base_path)
 
+        # Create 0.2 layout by default
         %w[
-          _memory/progress_logs
-          _memory/context_refresh
-          _memory/knowledge_base
-          _memory/notebooks
-          _memory/tmp
+          progress_logs
+          context_refresh
+          knowledge_base
+          notebooks
+          tmp
           longform_docs
           files
         ].each do |dir|
@@ -52,8 +55,16 @@ module Holocron
       end
 
       def create_buffer_file
-        buffer_path = File.join(@directory, '_memory', 'tmp', 'buffer')
+        buffer_path = File.join(@directory, 'tmp', 'buffer')
         File.write(buffer_path, '')
+      end
+
+      def create_holocron_json
+        holocron_json_path = File.join(@directory, 'HOLOCRON.json')
+        holocron_data = {
+          version: '0.2.0'
+        }
+        File.write(holocron_json_path, JSON.pretty_generate(holocron_data))
       end
 
       def copy_templates

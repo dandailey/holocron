@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'colorize'
+require 'holocron/path_resolver'
 
 module Holocron
   module Commands
@@ -20,7 +21,8 @@ module Holocron
         timestamp = Time.now.strftime('%Y-%m-%d_%H%M%S')
         filename = "#{timestamp}_#{@slug}.md"
 
-        filepath = File.join(@holocron_directory, '_memory', 'progress_logs', filename)
+        path_resolver = PathResolver.new(@holocron_directory)
+        filepath = path_resolver.resolve_path("progress_logs/#{filename}")
 
         # Create the detailed progress log entry
         detailed_content = <<~CONTENT
@@ -61,20 +63,21 @@ module Holocron
       end
 
       def read_buffer_content
-        buffer_path = File.join(@holocron_directory, '_memory', 'tmp', 'buffer')
+        path_resolver = PathResolver.new(@holocron_directory)
+        buffer_path = path_resolver.resolve_path('tmp/buffer')
 
         unless File.exist?(buffer_path)
           FileUtils.mkdir_p(File.dirname(buffer_path))
           File.write(buffer_path, '')
           puts 'Error: Buffer file was empty, created new one'.colorize(:red)
-          puts 'Add content to _memory/tmp/buffer first'.colorize(:yellow)
+          puts 'Add content to tmp/buffer first'.colorize(:yellow)
           exit 1
         end
 
         content = File.read(buffer_path)
         if content.strip.empty?
           puts 'Error: Buffer file is empty'.colorize(:red)
-          puts 'Add content to _memory/tmp/buffer first'.colorize(:yellow)
+          puts 'Add content to tmp/buffer first'.colorize(:yellow)
           exit 1
         end
 
@@ -91,17 +94,17 @@ module Holocron
         new_entry = <<~ENTRY
           ## #{timestamp}: #{summary}
 
-          *Detailed log: [_memory/progress_logs/#{filename}](_memory/progress_logs/#{filename})*
+          *Detailed log: [progress_logs/#{filename}](progress_logs/#{filename})*
         ENTRY
 
-        # Append to the end, before the "See _memory/progress_logs/" line if it exists
-        updated_content = if existing_content.include?('See `_memory/progress_logs/`')
+        # Append to the end, before the "See progress_logs/" line if it exists
+        updated_content = if existing_content.include?('See `progress_logs/`')
                             existing_content.gsub(
-                              'See `_memory/progress_logs/` for detailed entries.',
-                              "#{new_entry}\n\nSee `_memory/progress_logs/` for detailed entries."
+                              'See `progress_logs/` for detailed entries.',
+                              "#{new_entry}\n\nSee `progress_logs/` for detailed entries."
                             )
                           else
-                            "#{existing_content.chomp}\n#{new_entry}\n\nSee `_memory/progress_logs/` for detailed entries.\n"
+                            "#{existing_content.chomp}\n#{new_entry}\n\nSee `progress_logs/` for detailed entries.\n"
                           end
 
         File.write(main_log_path, updated_content)

@@ -36,6 +36,10 @@ module Holocron
       prepend_date_header(load_documentation('guides/server.md'))
     end
 
+    def self.changelog_guide
+      prepend_date_header(load_documentation('guides/changelog.md'))
+    end
+
     private
 
     def self.load_documentation(relative_path)

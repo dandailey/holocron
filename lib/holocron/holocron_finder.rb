@@ -3,6 +3,7 @@
 require 'fileutils'
 require 'colorize'
 require 'holocron/registry'
+require 'holocron/path_resolver'
 
 module Holocron
   class HolocronFinder
@@ -13,7 +14,7 @@ module Holocron
         return explicit_path if valid_holocron_directory?(explicit_path)
 
         puts "❌ Specified directory '#{explicit_dir}' is not a valid holocron directory".colorize(:red)
-        puts '   Expected to find _memory/ directory'.colorize(:yellow)
+        puts '   Expected to find HOLOCRON.json (0.2+) or _memory/ directory (0.1)'.colorize(:yellow)
         return nil
       end
 
@@ -37,9 +38,7 @@ module Holocron
     end
 
     def self.valid_holocron_directory?(directory)
-      return false unless Dir.exist?(directory)
-
-      Dir.exist?(File.join(directory, '_memory'))
+      PathResolver.valid_holocron_directory?(directory)
     end
 
     def initialize(start_dir = '.')
@@ -63,7 +62,7 @@ module Holocron
 
       # Check for .holocron/sync directory (symlink case)
       sync_dir = File.join(@start_dir, '.holocron', 'sync')
-      return sync_dir if Dir.exist?(sync_dir) && Dir.exist?(File.join(sync_dir, '_memory'))
+      return sync_dir if Dir.exist?(sync_dir) && self.class.valid_holocron_directory?(sync_dir)
 
       nil
     end
@@ -78,7 +77,7 @@ module Holocron
       puts '  holo --dir .holocron/sync <command>'.colorize(:cyan)
       puts
       puts 'A valid holocron directory contains:'.colorize(:yellow)
-      puts '  • _memory/ directory'.colorize(:white)
+      puts '  • HOLOCRON.json (0.2+) or _memory/ directory (0.1)'.colorize(:white)
       puts
       puts 'Current directory: '.colorize(:yellow) + @start_dir
       puts

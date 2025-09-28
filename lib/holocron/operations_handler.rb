@@ -4,11 +4,13 @@ require 'json'
 require 'digest'
 require 'fileutils'
 require_relative 'diff_parser'
+require_relative 'path_resolver'
 
 module Holocron
   class OperationsHandler
     def initialize(holocron_path)
       @holocron_path = File.expand_path(holocron_path)
+      @path_resolver = PathResolver.new(holocron_path)
     end
 
     def handle_operation(operation, method, params = {}, body = {})
@@ -66,7 +68,7 @@ module Holocron
       limit = data['limit']&.to_i
       offset = data['offset']&.to_i || 0
 
-      base_path = File.join(@holocron_path, dir)
+      base_path = @path_resolver.resolve_path(dir)
       return error_response('Directory not found', 404) unless Dir.exist?(base_path)
 
       files = []
@@ -485,7 +487,7 @@ module Holocron
     def safe_file_path(relative_path)
       # Remove any path traversal attempts and ensure it's within holocron root
       clean_path = relative_path.to_s.gsub(%r{\.\./}, '').gsub(%r{^/+}, '')
-      File.join(@holocron_path, clean_path)
+      @path_resolver.resolve_path(clean_path)
     end
 
     def sanitize_path(path)

@@ -32,7 +32,7 @@ module Holocron
         puts '  holo [command] --dir .holocron/sync'.colorize(:cyan)
         puts
         puts 'A valid holocron directory contains:'.colorize(:yellow)
-        puts '  • _memory/ directory'.colorize(:white)
+        puts '  • HOLOCRON.json (0.2+) or _memory/ directory (0.1)'.colorize(:white)
         puts
         puts 'Current directory: '.colorize(:yellow) + File.expand_path('.')
         puts

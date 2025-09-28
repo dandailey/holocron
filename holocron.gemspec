@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.name = 'holocron'
   spec.version = Holocron::VERSION
   spec.authors = ['Daniel Dailey']
-  spec.email = ['daniel@example.com']
+  spec.email = ['daniel@daileyhome.com']
 
   spec.summary = 'Persistent memory framework for AI assistants working on long-form projects'
   spec.description = 'Holocron provides a structured documentation system that acts as persistent memory for AI assistants, enabling context maintenance across chat sessions and project management.'

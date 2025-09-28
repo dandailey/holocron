@@ -18,6 +18,7 @@ require 'holocron/commands/buffer'
 require 'holocron/commands/notebook'
 require 'holocron/commands/server'
 require 'holocron/commands/registry'
+require 'holocron/commands/upgrade'
 require 'holocron/holocron_finder'
 
 module Holocron
@@ -133,6 +134,11 @@ module Holocron
       end
 
       Commands::Server.new(action, options).call
+    end
+
+    desc 'upgrade', 'Show instructions to perform a Holocron upgrade using an AI assistant'
+    def upgrade
+      Commands::Upgrade.new(options).call
     end
 
     desc 'list', 'List registered holocrons'

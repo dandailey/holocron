@@ -2,6 +2,7 @@
 
 require 'yaml'
 require 'fileutils'
+require 'holocron/path_resolver'
 
 module Holocron
   class Registry
@@ -67,7 +68,7 @@ module Holocron
       holo = get(name)
       return false unless holo
 
-      File.exist?(File.join(holo[:path], '_memory'))
+      PathResolver.valid_holocron_directory?(holo[:path])
     end
 
     def names

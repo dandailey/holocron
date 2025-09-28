@@ -82,23 +82,40 @@ module Holocron
       end
 
       def start_background_server
-        puts '🚀 Background Server Mode'
-        puts ''
-        puts '⚠️  Built-in background mode is not supported due to Ruby process management complexity.'
-        puts '   Instead, use one of these reliable approaches:'
-        puts ''
-        puts '   🎯 Recommended - Using nohup:'
-        puts "   nohup holo server start --port=#{@port} --host=#{@host} > ~/.holocron_server.log 2>&1 &"
-        puts ''
-        puts '   📺 Using screen/tmux:'
-        puts '   screen -S holocron-server holo server start'
-        puts '   # Then detach with Ctrl+A, D'
-        puts ''
-        puts '   🪟 Separate terminal:'
-        puts "   holo server start --port=#{@port} --host=#{@host}"
-        puts ''
-        puts '✅ All approaches support proper shutdown with: holo server stop'
-        puts '📝 Logs will be written to: ~/.holocron_server.log'
+        puts '🚀 Starting Holocron server in background...'
+
+        # Fork to background
+        pid = Process.fork do
+          # Detach from parent process
+          Process.setsid
+
+          # Redirect output to log file
+          log_file = File.expand_path('~/.holocron_server.log')
+          $stdout.reopen(log_file, 'a')
+          $stderr.reopen(log_file, 'a')
+
+          # Start the server
+          start_webrick_server
+        end
+
+        # Detach the child process so parent doesn't wait for it
+        Process.detach(pid)
+
+        # Save PID
+        write_pid(pid)
+
+        # Give server a moment to start
+        sleep 2
+
+        if server_running?
+          puts "✅ Server started successfully (PID: #{pid})"
+          puts "🌐 Server running at: http://#{@host}:#{@port}"
+          puts '📝 Logs: ~/.holocron_server.log'
+          puts '🛑 Stop with: holo server stop'
+        else
+          puts '❌ Failed to start server'
+          File.delete(@pid_file) if File.exist?(@pid_file)
+        end
       end
 
       def stop_server
