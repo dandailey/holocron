@@ -2,6 +2,7 @@
 
 require 'colorize'
 require 'holocron/registry'
+require 'holocron/path_resolver'
 
 module Holocron
   module Commands
@@ -73,8 +74,8 @@ module Holocron
         end
 
         expanded = File.expand_path(directory)
-        unless Dir.exist?(expanded) && Dir.exist?(File.join(expanded, '_memory'))
-          puts "Directory is not a valid holocron (missing _memory): #{expanded}".colorize(:red)
+        unless PathResolver.valid_holocron_directory?(expanded)
+          puts "Directory is not a valid holocron: #{expanded}".colorize(:red)
           exit 1
         end
 

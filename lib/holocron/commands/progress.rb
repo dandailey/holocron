@@ -43,7 +43,7 @@ module Holocron
         CONTENT
 
         FileUtils.mkdir_p(File.dirname(filepath))
-        File.write(filepath, detailed_content)
+        File.write(filepath, detailed_content, encoding: 'UTF-8')
 
         # Update the main progress log
         update_main_progress_log(@holocron_directory, timestamp, @summary, filename)
@@ -74,7 +74,7 @@ module Holocron
           exit 1
         end
 
-        content = File.read(buffer_path)
+        content = File.read(buffer_path, encoding: 'UTF-8')
         if content.strip.empty?
           puts 'Error: Buffer file is empty'.colorize(:red)
           puts 'Add content to tmp/buffer first'.colorize(:yellow)
@@ -88,7 +88,12 @@ module Holocron
         main_log_path = File.join(holocron_dir, 'progress_log.md')
 
         # Read existing content or create new file
-        existing_content = File.exist?(main_log_path) ? File.read(main_log_path) : "# Progress Log (Summary)\n\n"
+        existing_content = if File.exist?(main_log_path)
+                             File.read(main_log_path,
+                                       encoding: 'UTF-8')
+                           else
+                             "# Progress Log (Summary)\n\n"
+                           end
 
         # Add new entry to the summary - keep it concise
         new_entry = <<~ENTRY
@@ -107,7 +112,7 @@ module Holocron
                             "#{existing_content.chomp}\n#{new_entry}\n\nSee `progress_logs/` for detailed entries.\n"
                           end
 
-        File.write(main_log_path, updated_content)
+        File.write(main_log_path, updated_content, encoding: 'UTF-8')
       end
 
       def generate_summary_from_content

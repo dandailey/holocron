@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'colorize'
+require 'holocron/path_resolver'
 
 module Holocron
   module Commands
@@ -40,20 +41,21 @@ module Holocron
       end
 
       def read_buffer_content
-        buffer_path = File.join(@holocron_directory, '_memory', 'tmp', 'buffer')
+        path_resolver = PathResolver.new(@holocron_directory)
+        buffer_path = path_resolver.resolve_path('tmp/buffer')
 
         unless File.exist?(buffer_path)
           FileUtils.mkdir_p(File.dirname(buffer_path))
           File.write(buffer_path, '')
           puts 'Error: Buffer file was empty, created new one'.colorize(:red)
-          puts 'Add content to _memory/tmp/buffer first'.colorize(:yellow)
+          puts 'Add content to tmp/buffer first'.colorize(:yellow)
           exit 1
         end
 
-        content = File.read(buffer_path)
+        content = File.read(buffer_path, encoding: 'UTF-8')
         if content.strip.empty?
           puts 'Error: Buffer file is empty'.colorize(:red)
-          puts 'Add content to _memory/tmp/buffer first'.colorize(:yellow)
+          puts 'Add content to tmp/buffer first'.colorize(:yellow)
           exit 1
         end
 
@@ -63,7 +65,7 @@ module Holocron
       def create_suggestion_file
         timestamp = Time.now.strftime('%Y_%m_%d_%H%M%S')
         filename = "#{timestamp}_suggestion.md"
-        filepath = File.join(@holocron_directory, '_memory', 'suggestion_queue', filename)
+        filepath = path_resolver.resolve_path("archive/suggestions/#{filename}")
 
         content = <<~CONTENT
           # Suggestion: #{@message}

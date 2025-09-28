@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'colorize'
+require 'holocron/path_resolver'
 
 module Holocron
   module Commands
@@ -18,23 +19,24 @@ module Holocron
         timestamp = Time.now.strftime('%Y_%m_%d_%H%M%S')
         filename = "_PENDING_#{timestamp}_#{@slug}.md"
 
-        filepath = File.join(@holocron_directory, '_memory', 'context_refresh', filename)
+        path_resolver = PathResolver.new(@holocron_directory)
+        filepath = path_resolver.resolve_path("context_refresh/#{filename}")
 
         if options[:from_buffer]
           # Read content from buffer file
-          buffer_path = File.join(@holocron_directory, '_memory', 'tmp', 'buffer')
+          buffer_path = path_resolver.resolve_path('tmp/buffer')
 
           unless File.exist?(buffer_path)
             puts '❌ Buffer file not found!'.colorize(:red)
-            puts 'Write content to _memory/tmp/buffer first, then try again.'.colorize(:yellow)
+            puts 'Write content to tmp/buffer first, then try again.'.colorize(:yellow)
             return
           end
 
-          content = File.read(buffer_path)
+          content = File.read(buffer_path, encoding: 'UTF-8')
 
           if content.strip.empty?
             puts '❌ Buffer file is empty!'.colorize(:red)
-            puts 'Write content to _memory/tmp/buffer first, then try again.'.colorize(:yellow)
+            puts 'Write content to tmp/buffer first, then try again.'.colorize(:yellow)
             return
           end
         else

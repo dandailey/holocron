@@ -44,7 +44,7 @@ module Holocron
 
     def self.load_documentation(relative_path)
       docs_path = File.join(gem_root, 'docs', relative_path)
-      File.read(docs_path)
+      File.read(docs_path, encoding: 'UTF-8')
     rescue Errno::ENOENT
       "Documentation file not found: #{relative_path}"
     end

@@ -3,6 +3,7 @@
 require 'yaml'
 require 'colorize'
 require 'fileutils'
+require 'holocron/path_resolver'
 
 module Holocron
   module Commands
@@ -46,14 +47,27 @@ module Holocron
       private
 
       def check_directory_structure
-        required_dirs = %w[
-          _memory
-          _memory/progress_logs
-          _memory/context_refresh
-          _memory/knowledge_base
-          longform_docs
-          files
-        ]
+        path_resolver = PathResolver.new(@directory)
+        version = path_resolver.detect_layout_version
+
+        required_dirs = if version == '0.2'
+                          %w[
+                            progress_logs
+                            context_refresh
+                            knowledge_base
+                            longform_docs
+                            files
+                          ]
+                        else
+                          %w[
+                            _memory
+                            _memory/progress_logs
+                            _memory/context_refresh
+                            _memory/knowledge_base
+                            longform_docs
+                            files
+                          ]
+                        end
 
         required_dirs.each do |dir|
           dir_path = File.join(@directory, dir)
@@ -62,16 +76,32 @@ module Holocron
       end
 
       def check_required_files
-        required_files = %w[
-          README.md
-          action_plan.md
-          project_overview.md
-          progress_log.md
-          todo.md
-          _memory/decision_log.md
-          _memory/env_setup.md
-          _memory/test_list.md
-        ]
+        path_resolver = PathResolver.new(@directory)
+        version = path_resolver.detect_layout_version
+
+        required_files = if version == '0.2'
+                           %w[
+                             README.md
+                             action_plan.md
+                             project_overview.md
+                             progress_log.md
+                             todo.md
+                             decision_log.md
+                             env_setup.md
+                             test_list.md
+                           ]
+                         else
+                           %w[
+                             README.md
+                             action_plan.md
+                             project_overview.md
+                             progress_log.md
+                             todo.md
+                             _memory/decision_log.md
+                             _memory/env_setup.md
+                             _memory/test_list.md
+                           ]
+                         end
 
         required_files.each do |file|
           file_path = File.join(@directory, file)

@@ -144,7 +144,7 @@ module Holocron
       offset = data['offset']&.to_i
       limit = data['limit']&.to_i
 
-      content = File.read(file_path)
+      content = File.read(file_path, encoding: 'UTF-8')
 
       # Apply line-based offset/limit if specified
       if offset || limit
@@ -155,7 +155,7 @@ module Holocron
       end
 
       stat = File.stat(file_path)
-      sha256 = Digest::SHA256.hexdigest(File.read(file_path)) # Always hash full file
+      sha256 = Digest::SHA256.hexdigest(File.read(file_path, encoding: 'UTF-8')) # Always hash full file
 
       result = {
         path: path,
@@ -188,7 +188,7 @@ module Holocron
       if if_match_sha256
         return error_response('Precondition failed: file does not exist', 412) unless File.exist?(file_path)
 
-        current_sha256 = Digest::SHA256.hexdigest(File.read(file_path))
+        current_sha256 = Digest::SHA256.hexdigest(File.read(file_path, encoding: 'UTF-8'))
         return error_response('Precondition failed: file has been modified', 412) if current_sha256 != if_match_sha256
 
       end
@@ -209,7 +209,7 @@ module Holocron
       created = !File.exist?(file_path)
 
       # Write file
-      File.write(file_path, content)
+      File.write(file_path, content, encoding: 'UTF-8')
 
       # Calculate new hash
       new_sha256 = Digest::SHA256.hexdigest(content)
@@ -236,7 +236,7 @@ module Holocron
 
       # Check precondition if specified
       if if_match_sha256
-        current_sha256 = Digest::SHA256.hexdigest(File.read(file_path))
+        current_sha256 = Digest::SHA256.hexdigest(File.read(file_path, encoding: 'UTF-8'))
         return error_response('Precondition failed: file has been modified', 412) if current_sha256 != if_match_sha256
       end
 
@@ -280,7 +280,7 @@ module Holocron
         next unless File.exist?(file_path)
 
         begin
-          content = File.read(file_path)
+          content = File.read(file_path, encoding: 'UTF-8')
           lines = content.lines
           matches = []
 
@@ -358,7 +358,7 @@ module Holocron
 
       # Check precondition if specified
       if if_match_sha256
-        current_sha256 = Digest::SHA256.hexdigest(File.read(from_path))
+        current_sha256 = Digest::SHA256.hexdigest(File.read(from_path, encoding: 'UTF-8'))
         if current_sha256 != if_match_sha256
           return error_response('Precondition failed: source file has been modified', 412)
         end
@@ -371,7 +371,7 @@ module Holocron
       File.rename(from_path, to_path)
 
       # Get hash of moved file
-      sha256 = Digest::SHA256.hexdigest(File.read(to_path))
+      sha256 = Digest::SHA256.hexdigest(File.read(to_path, encoding: 'UTF-8'))
 
       {
         from: from,
@@ -420,7 +420,7 @@ module Holocron
         end
 
         begin
-          content = File.read(file_path)
+          content = File.read(file_path, encoding: 'UTF-8')
           bundle[file_info[:path]] = content
           total_bytes += content.bytesize
         rescue StandardError => e

@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'colorize'
+require 'holocron/path_resolver'
 require 'holocron/template_manager'
 
 module Holocron
@@ -39,7 +40,7 @@ module Holocron
         puts '✅ Contributor working memory initialized!'.colorize(:green)
         puts 'Next steps:'.colorize(:yellow)
         puts '  - Read .holocron/README.md to understand the project'
-        puts '  - Update .holocron/_memory/env_setup.md with your environment'
+        puts '  - Update .holocron/env_setup.md with your environment'
         puts '  - Start tracking your development decisions and progress'
         puts "  - Use 'holo doctor .holocron' to validate your setup"
       end
@@ -50,9 +51,9 @@ module Holocron
         FileUtils.mkdir_p('.holocron')
 
         %w[
-          _memory/progress_logs
-          _memory/context_refresh
-          _memory/knowledge_base
+          progress_logs
+          context_refresh
+          knowledge_base
           longform_docs
           files
         ].each do |dir|
@@ -84,9 +85,9 @@ module Holocron
           - `.holocron/` - Your working memory (this directory)
 
           ## Quick Access
-          - **Environment setup**: [\`_memory/env_setup.md\`](_memory/env_setup.md)
-          - **Development decisions**: [\`_memory/decision_log.md\`](_memory/decision_log.md)
-          - **Test tracking**: [\`_memory/test_list.md\`](_memory/test_list.md)
+          - **Environment setup**: [\`env_setup.md\`](env_setup.md)
+          - **Development decisions**: [\`decision_log.md\`](decision_log.md)
+          - **Test tracking**: [\`test_list.md\`](test_list.md)
           - **Project roadmap**: [\`../docs/roadmap.md\`](../docs/roadmap.md)
           - **Contributing guide**: [\`../docs/contributing.md\`](../docs/contributing.md)
 
@@ -121,9 +122,9 @@ module Holocron
           ```
 
           ### Working Memory Usage
-          - **Track decisions** in `_memory/decision_log.md`
-          - **Log progress** in `_memory/progress_logs/`
-          - **Document environment** in `_memory/env_setup.md`
+          - **Track decisions** in `decision_log.md`
+          - **Log progress** in `progress_logs/`
+          - **Document environment** in `env_setup.md`
           - **Create context refreshes** with `holo context-refresh --name "reason"`
           - **Submit suggestions** with `holo suggest "idea"`
 

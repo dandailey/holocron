@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'colorize'
+require 'holocron/path_resolver'
 require 'holocron/holocron_finder'
 
 module Holocron
@@ -45,7 +46,8 @@ module Holocron
       def process_pending_refreshes
         return unless @holocron_directory
 
-        context_refresh_dir = File.join(@holocron_directory, '_memory', 'context_refresh')
+        path_resolver = PathResolver.new(@holocron_directory)
+        context_refresh_dir = path_resolver.resolve_path('context_refresh')
         return unless Dir.exist?(context_refresh_dir)
 
         pending_files = Dir.glob(File.join(context_refresh_dir, '_PENDING_*.md'))
@@ -72,7 +74,7 @@ module Holocron
           puts
           puts '📄 Context Refresh Content:'.colorize(:cyan)
           puts '-' * 30
-          content = File.read(new_file_path)
+          content = File.read(new_file_path, encoding: 'UTF-8')
           puts content
           puts '-' * 30
           puts

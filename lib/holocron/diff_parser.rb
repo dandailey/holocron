@@ -128,7 +128,7 @@ module Holocron
 
       begin
         # Read existing file if it exists
-        existing_content = File.exist?(full_path) ? File.read(full_path) : ''
+        existing_content = File.exist?(full_path) ? File.read(full_path, encoding: 'UTF-8') : ''
         existing_lines = existing_content.lines.map(&:chomp)
 
         # Apply each hunk
@@ -140,13 +140,13 @@ module Holocron
         # Determine if this is a create, modify, or delete
         if !File.exist?(full_path)
           result[:created] = true
-        elsif existing_lines != File.read(full_path).lines.map(&:chomp)
+        elsif existing_lines != File.read(full_path, encoding: 'UTF-8').lines.map(&:chomp)
           result[:modified] = true
         end
 
         # Write the file
         FileUtils.mkdir_p(File.dirname(full_path))
-        File.write(full_path, existing_lines.join("\n") + "\n")
+        File.write(full_path, existing_lines.join("\n") + "\n", encoding: 'UTF-8')
       rescue StandardError => e
         result[:errors] << e.message
       end

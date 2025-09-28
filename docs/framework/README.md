@@ -41,7 +41,7 @@ Understanding how to read from, write to, AND FOLLOW your own Holocron is your f
 
 ### Holocron Detection
 
-Holocrons are detected by the presence of a `_memory/` directory. No configuration files are required.
+Holocrons are detected by the presence of a `HOLOCRON.json` file (0.2+) or `_memory/` directory (0.1). No additional configuration files are required.
 
 ### Framework Directory
 
@@ -65,12 +65,12 @@ All the files in the root of your Holocron are the most important things to know
 
 ### Memory
 
-Your `_memory` folder is all about persisting details. The files in the root of your Holocron have the details you'll want to know every time, whereas the files/folders in your memory are for when you need to dig up the nitty gritty on stuff.
+Your memory folders are all about persisting details. The files in the root of your Holocron have the details you'll want to know every time, whereas the files/folders in your memory directories are for when you need to dig up the nitty gritty on stuff.
 
 #### Standardized/Formatted Memory
-`_memory/decision_log.md` - Log of major choices made. Append details of such decisions, with dates and details, to this log.
+`decision_log.md` - Log of major choices made. Append details of such decisions, with dates and details, to this log.
 
-`_memory/env_setup.md` - Environment setup **and** tech stack details. Include:
+`env_setup.md` - Environment setup **and** tech stack details. Include:
 - Core language / framework versions
 - Key libraries, gems, packages, and why they matter
 - External services and how to run/point to them
@@ -79,14 +79,14 @@ Your `_memory` folder is all about persisting details. The files in the root of 
 - Common issues and solutions
 - Useful development commands
 
-`_memory/test_list.md` - If the project involves writing tests, keep track of all the tests you're writing here.
+`test_list.md` - If the project involves writing tests, keep track of all the tests you're writing here.
 
-`_memory/progress_logs/` - Progress logs. Each entry is a separate file, named `YYYY-MM-DD_HHMMSS_slug.md`. Update the `progress_log.md` in the root by appending a much abbreviated date/description of what's in that file.
+`progress_logs/` - Progress logs. Each entry is a separate file, named `YYYY-MM-DD_HHMMSS_slug.md`. Update the `progress_log.md` in the root by appending a much abbreviated date/description of what's in that file.
 
-`_memory/context_refresh/` - Automated context refresh system. During a chat session, if you're asked to refresh your context, you'll write yourself a prompt and put it here.
+`context_refresh/` - Automated context refresh system. During a chat session, if you're asked to refresh your context, you'll write yourself a prompt and put it here.
 
 #### Your Knowledge Base
-`_memory/knowledge_base/` is intended to be a completely freeform space for you to create notes/memories for yourself.
+`knowledge_base/` is intended to be a completely freeform space for you to create notes/memories for yourself.
 
 ### Working Areas
 `longform_docs/` - Complex documentation broken into parts. Run `holo guide creating-long-form-docs` for instructions.
@@ -111,11 +111,11 @@ Questions you should ask yourself (EVERY TIME):
 
 - **When executing a task** from `action_plan.md`, keep the scope of action small enough that you're confident you can complete it before your context window becomes bloated.
 - **Implement the work** described under that block. Again, keep the scope tight.
-- **Add / update tests** as needed. If you create new tests, list their paths in `_memory/test_list.md`
+- **Add / update tests** as needed. If you create new tests, list their paths in `test_list.md`
 - **Refactor hygiene** – clean up after yourself in any way needed to make your end product clean and focused.
 - **Run project linters / formatters** and fix any violations.
 - **Run affected test suites** – ensure green.
-- **Log your work** in `_memory/progress_logs`.
+- **Log your work** in `progress_logs`.
 - **Tick the completed items** in `action_plan.md`
 - **Stop.** Do **not** move onto more tasks then you originally decided to take on unless explicitly asked.
 
@@ -192,7 +192,7 @@ For full details, run `holo guide registry`.
 - `holo context-refresh --from-buffer`
 
 **Workflow (for AI agents):**
-1. Write content directly to `_memory/tmp/buffer` using your file writing tools/functions
+1. Write content directly to `tmp/buffer` using your file writing tools/functions
 2. Use `holo buffer` to verify content
 3. Run commands with `--from-buffer` flag
 4. Use `holo buffer clear` when done
@@ -315,7 +315,7 @@ For full details, run `holo guide registry`.
 
 - **Your Holocron:** The folder holding the README file that likely sent you here
 - **Files:** "Check files folder" = look in `files/` inside your Holocron
-- **Memory:** Your `/_memory` folder
+- **Memory:** Your memory folders (`progress_logs/`, `context_refresh/`, `knowledge_base/`, etc.)
 - **Context Refresh:** When asked to refresh your context, read and follow the Context Refresh Guide
 
 ---

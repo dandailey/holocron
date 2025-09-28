@@ -55,7 +55,7 @@ holo init docs-holo ./docs/holocron
 ```
 
 **What it creates:**
-- Complete directory structure (`_memory/`, `longform_docs/`, `files/`)
+- Complete directory structure (`progress_logs/`, `context_refresh/`, `knowledge_base/`, `longform_docs/`, `files/`)
 - All required files (`README.md`, `action_plan.md`, etc.)
 - Registers the holocron under the given name in `~/.holocron.yml`
 
@@ -126,7 +126,7 @@ holo context-refresh --name "feature_complete"
 ```
 
 **What it creates:**
-- Context refresh file in `_memory/context_refresh/`
+- Context refresh file in `context_refresh/`
 - Timestamped filename (YYYY_MM_DD_HHMMSS format)
 - Template with sections for objectives, decisions, files, blockers
 - Ready for immediate use (no manual editing required)
@@ -161,7 +161,7 @@ holo progress --from-buffer
 ```
 
 **What it creates:**
-- Detailed log file in `_memory/progress_logs/`
+- Detailed log file in `progress_logs/`
 - Updates main `progress_log.md` with summary
 - Timestamped filename (YYYY_MM_DD_HHMMSS format)
 

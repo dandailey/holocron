@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'colorize'
+require 'holocron/path_resolver'
 
 module Holocron
   module Commands
@@ -9,7 +10,8 @@ module Holocron
       def initialize(action, options)
         super(options)
         @action = action || 'show' # Default to 'show' if no action provided
-        @buffer_path = File.join(@holocron_directory, '_memory', 'tmp', 'buffer')
+        path_resolver = PathResolver.new(@holocron_directory)
+        @buffer_path = path_resolver.resolve_path('tmp/buffer')
       end
 
       def call
@@ -34,7 +36,7 @@ module Holocron
       def show_buffer
         ensure_buffer_exists
 
-        content = File.read(@buffer_path)
+        content = File.read(@buffer_path, encoding: 'UTF-8')
         if content.strip.empty?
           puts 'Buffer file exists but is empty.'.colorize(:yellow)
           return
@@ -58,7 +60,7 @@ module Holocron
       def show_status
         ensure_buffer_exists
 
-        content = File.read(@buffer_path)
+        content = File.read(@buffer_path, encoding: 'UTF-8')
         size = content.bytesize
         lines = content.lines.count
         modified = File.mtime(@buffer_path).strftime('%Y-%m-%d %H:%M:%S')
