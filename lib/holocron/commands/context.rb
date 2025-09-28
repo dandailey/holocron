@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: utf-8
 
 require 'fileutils'
 require 'colorize'
@@ -39,6 +40,9 @@ module Holocron
             puts 'Write content to tmp/buffer first, then try again.'.colorize(:yellow)
             return
           end
+
+          # Ensure content is properly encoded as UTF-8
+          content = content.encode('UTF-8')
         else
           # Use template for manual editing
           content = <<~CONTENT

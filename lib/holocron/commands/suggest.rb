@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: utf-8
 
 require 'fileutils'
 require 'colorize'
@@ -59,7 +60,8 @@ module Holocron
           exit 1
         end
 
-        content
+        # Ensure content is properly encoded as UTF-8
+        content.encode('UTF-8')
       end
 
       def create_suggestion_file

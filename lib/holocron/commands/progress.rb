@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: utf-8
 
 require 'fileutils'
 require 'colorize'
@@ -10,7 +11,8 @@ module Holocron
       def initialize(content, options)
         super(options)
         @content = determine_content(content, options)
-        @summary = options[:summary] || generate_summary_from_content
+        summary_raw = options[:summary] || generate_summary_from_content
+        @summary = summary_raw.dup.force_encoding('UTF-8').encode('UTF-8')
         @name = options[:name] || 'progress_update'
         @slug = generate_slug_from_name(@name)
       end
@@ -25,22 +27,10 @@ module Holocron
         filepath = path_resolver.resolve_path("progress_logs/#{filename}")
 
         # Create the detailed progress log entry
-        detailed_content = <<~CONTENT
-          # #{@summary}
-
-          **Date:** #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}
-          **Summary:** #{@summary}
-
-          ## Details
-
-          #{@content}
-
-          ## Impact
-          <!-- What does this work enable or improve? -->
-
-          ## Next Steps
-          <!-- What should happen next as a result of this work? -->
-        CONTENT
+        # Ensure content is UTF-8 encoded
+        content_utf8 = @content.encode('UTF-8')
+        
+        detailed_content = "# #{@summary}\n\n**Date:** #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}\n**Summary:** #{@summary}\n\n## Details\n\n#{content_utf8}\n\n## Impact\n<!-- What does this work enable or improve? -->\n\n## Next Steps\n<!-- What should happen next as a result of this work? -->"
 
         FileUtils.mkdir_p(File.dirname(filepath))
         File.write(filepath, detailed_content, encoding: 'UTF-8')
@@ -68,7 +58,7 @@ module Holocron
 
         unless File.exist?(buffer_path)
           FileUtils.mkdir_p(File.dirname(buffer_path))
-          File.write(buffer_path, '')
+          File.write(buffer_path, '', encoding: 'UTF-8')
           puts 'Error: Buffer file was empty, created new one'.colorize(:red)
           puts 'Add content to tmp/buffer first'.colorize(:yellow)
           exit 1
@@ -81,7 +71,8 @@ module Holocron
           exit 1
         end
 
-        content
+        # Ensure content is properly encoded as UTF-8
+        content.encode('UTF-8')
       end
 
       def update_main_progress_log(holocron_dir, timestamp, summary, filename)
