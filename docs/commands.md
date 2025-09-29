@@ -23,6 +23,7 @@ Holocron provides a simple CLI with the following commands:
 - `holo suggest` - Submit framework suggestions
 - `holo contribute` - Initialize working memory for contributing to this project
 - `holo buffer` - Manage buffer file for longform content
+- `holo ops` - Execute Holocron operations with unified CLI interface
 
 ## Global Options
 
@@ -448,6 +449,159 @@ The `--from-buffer` flag can be used with:
 2. Use `holo buffer` to verify content
 3. Run commands with `--from-buffer` flag
 4. Use `holo buffer clear` when done
+
+### `holo ops [OPERATION]`
+
+Execute Holocron operations with unified CLI interface. This command provides direct access to all core Holocron operations with consistent parameter mapping and output formats.
+
+**Usage:**
+```bash
+holo ops [OPERATION] [options]
+```
+
+**Available Operations:**
+- `list_files` - List files with filtering, sorting, and pagination
+- `read_file` - Read file content with offset/limit support
+- `put_file` - Create or update a file
+- `delete_file` - Delete a file
+- `search` - Search content across files
+- `move_file` - Move or rename a file
+- `bundle` - Bundle multiple files
+- `apply_diff` - Apply a diff to multiple files
+
+**Global Options:**
+- `--json` - Output in JSON format (machine-readable)
+- `--from-buffer` - Read content from buffer file
+- `--stdin` - Read content from stdin
+- `--dir DIR` - Holocron directory (auto-discovered if not specified)
+
+**Common Options (apply to multiple operations):**
+- `--include-glob PATTERN` - Include files matching glob pattern (can be repeated)
+- `--exclude-glob PATTERN` - Exclude files matching glob pattern (can be repeated)
+- `--extensions EXT` - Filter by file extensions (can be repeated)
+- `--max-depth N` - Maximum directory depth to search
+- `--sort FIELD` - Sort by: path, mtime, size
+- `--order ORDER` - Sort order: asc, desc
+- `--limit N` - Limit number of results
+- `--offset N` - Offset for pagination
+
+**Operation-Specific Options:**
+
+**File Operations (`put_file`, `delete_file`):**
+- `--if-match-sha256 HASH` - Only proceed if file matches SHA256 hash
+
+**Search Operation:**
+- `--pattern PATTERN` - Search pattern (regex)
+- `--regex` - Treat pattern as regex
+- `--case-sensitive` - Case-sensitive search
+- `--before N` - Number of context lines before match
+- `--after N` - Number of context lines after match
+
+**Move Operation:**
+- `--to-path PATH` - Destination path for move operation
+- `--overwrite` - Overwrite existing files
+
+**Bundle Operation:**
+- `--paths PATH` - Paths to include in bundle (can be repeated)
+- `--max-size N` - Maximum bundle size in bytes
+
+**Apply Diff Operation:**
+- `--diff DIFF` - Diff content to apply
+- `--dry-run` - Preview changes without applying
+
+**Examples:**
+
+**List Files:**
+```bash
+# List all files
+holo ops list_files
+
+# List markdown files only
+holo ops list_files --extensions md
+
+# List files with pagination
+holo ops list_files --limit 10 --offset 20
+
+# List files sorted by modification time
+holo ops list_files --sort mtime --order desc
+
+# List files with JSON output
+holo ops list_files --json
+```
+
+**Read Files:**
+```bash
+# Read a file
+holo ops read_file README.md
+
+# Read with offset and limit
+holo ops read_file README.md --offset 10 --limit 5
+```
+
+**Search:**
+```bash
+# Simple text search
+holo ops search --pattern "Holocron" --include-glob "*.md"
+
+# Regex search with context
+holo ops search --pattern "def \\w+" --regex --before 2 --after 2
+
+# Case-sensitive search
+holo ops search --pattern "TODO" --case-sensitive
+
+# Search with JSON output
+holo ops search --pattern "error" --json
+```
+
+**File Operations:**
+```bash
+# Create/update a file
+holo ops put_file new_file.md --from-buffer
+
+# Delete a file with precondition
+holo ops delete_file old_file.md --if-match-sha256 abc123
+
+# Move a file
+holo ops move_file old_name.md --to-path new_name.md
+```
+
+**Advanced Usage:**
+```bash
+# Use repeated flags for arrays
+holo ops list_files --include-glob "*.md" --include-glob "*.txt" --exclude-glob "*.tmp"
+
+# Combine multiple options
+holo ops search --pattern "function" --extensions rb --extensions js --limit 5 --json
+
+# Use stdin for content
+echo "Hello World" | holo ops put_file greeting.txt --stdin
+```
+
+**Output Formats:**
+
+**Human-readable (default):**
+- Lists show file counts and summaries
+- Search shows file:line:content format
+- Operations show success/error messages
+- Colorized output for better readability
+
+**JSON format (`--json`):**
+- Machine-readable output
+- Consistent structure across all operations
+- Includes metadata like totals, timestamps, etc.
+- Suitable for scripting and automation
+
+**Error Handling:**
+- All operations return appropriate exit codes
+- Clear error messages for common issues
+- Validation of parameters before execution
+- Graceful handling of file system errors
+
+**Integration with Other Commands:**
+The `holo ops` command complements existing Holocron commands:
+- Use `holo ops` for core file operations
+- Use `holo progress`, `holo context-refresh` for specialized workflows
+- Use `holo buffer` with `--from-buffer` for complex content
 
 ## Troubleshooting Commands
 

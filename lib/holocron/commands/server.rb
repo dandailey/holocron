@@ -2,6 +2,7 @@
 
 require 'webrick'
 require 'json'
+require 'holocron/server_app'
 require 'fileutils'
 require 'holocron/commands/base_command'
 require 'holocron/holocron_finder'
@@ -17,6 +18,8 @@ module Holocron
         @port = options[:port] || 4567
         @host = options[:host] || 'localhost'
         @background = options[:background] || false
+        @adapter = (options[:adapter] || 'webrick').to_s
+        @rackup = options[:rackup]
         @pid_file = File.expand_path('~/.holocron_server.pid')
       end
 
@@ -78,7 +81,7 @@ module Holocron
         puts '   POST     /v1/{holo-name}/ops/bundle         - Bundle multiple files'
         puts ''
         puts 'Press Ctrl+C to stop the server'
-        start_webrick_server
+        start_rack_server
       end
 
       def start_background_server
@@ -95,7 +98,7 @@ module Holocron
           $stderr.reopen(log_file, 'a')
 
           # Start the server
-          start_webrick_server
+          start_rack_server
         end
 
         # Detach the child process so parent doesn't wait for it
@@ -203,13 +206,42 @@ module Holocron
         end
       end
 
+      def start_rack_server
+        case @adapter
+        when 'webrick', nil, ''
+          start_webrick_server
+          nil
+        when 'puma'
+          begin
+            require 'rack'
+            require 'rack/handler/puma'
+          rescue LoadError
+            puts '⚠️  Puma not available. Falling back to WEBrick.'
+            start_webrick_server
+            return
+          end
+
+          app = Holocron::ServerApp.new(host: @host, port: @port)
+          trap('INT') { exit }
+          puts '✅ Server started successfully'
+          Rack::Handler::Puma.run(app, Host: @host, Port: @port)
+        else
+          puts "⚠️  Unknown adapter '#{@adapter}', using WEBrick."
+          start_webrick_server
+        end
+      rescue StandardError => e
+        puts "❌ Error starting server: #{e.message}"
+        puts e.backtrace.first(5)
+        exit 1
+      rescue Interrupt
+        puts "\n🛑 Server stopped"
+      end
+
       def start_webrick_server
         server = WEBrick::HTTPServer.new(Port: @port, Host: @host)
 
-        # Add signal handling
         trap('INT') { server.shutdown }
 
-        # Enable DELETE and PUT methods for proc handlers
         WEBrick::HTTPServlet::ProcHandler.class_eval do
           def do_DELETE(req, res)
             @proc.call(req, res)
@@ -220,11 +252,8 @@ module Holocron
           end
         end
 
-        # Mount registry endpoint
         server.mount_proc('/v1/holocrons') { |req, res| handle_holocrons(req, res) }
         server.mount_proc('/v1/help') { |req, res| handle_help(req, res, nil) }
-
-        # Mount dynamic Holocron endpoints with all HTTP methods
         server.mount_proc('/v1/') { |req, res| handle_holocron_request(req, res) }
 
         puts '✅ Server started successfully'

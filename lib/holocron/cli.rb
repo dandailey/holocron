@@ -19,6 +19,7 @@ require 'holocron/commands/notebook'
 require 'holocron/commands/server'
 require 'holocron/commands/registry'
 require 'holocron/commands/upgrade'
+require 'holocron/commands/ops'
 require 'holocron/holocron_finder'
 
 module Holocron
@@ -124,6 +125,8 @@ module Holocron
     option :port, type: :numeric, default: 4567, desc: 'Port to run the server on'
     option :host, type: :string, default: 'localhost', desc: 'Host to bind the server to'
     option :background, type: :boolean, default: false, desc: 'Run server in background'
+    option :adapter, type: :string, default: 'webrick', desc: 'Rack adapter (webrick|puma)'
+    option :rackup, type: :string, desc: 'Custom rackup file (optional)'
     def server(action = 'start')
       # Handle restart action
       if action == 'restart'
@@ -159,6 +162,42 @@ module Holocron
     desc 'forget NAME', 'Remove a holocron from the registry'
     def forget(name = nil)
       Commands::RegistryCmd.new('forget', options.merge(name: name)).call
+    end
+
+    desc 'ops OPERATION [ARGS]', 'Execute Holocron operations with unified CLI interface'
+    option :json, type: :boolean, desc: 'Output in JSON format'
+    option :from_buffer, type: :boolean, desc: 'Read content from buffer file'
+    option :stdin, type: :boolean, desc: 'Read content from stdin'
+    # Common options for list_files
+    option :include_glob, type: :string, repeatable: true, desc: 'Include files matching glob pattern (can be repeated)'
+    option :exclude_glob, type: :string, repeatable: true, desc: 'Exclude files matching glob pattern (can be repeated)'
+    option :extensions, type: :string, repeatable: true, desc: 'Filter by file extensions (can be repeated)'
+    option :max_depth, type: :numeric, desc: 'Maximum directory depth to search'
+    option :sort, type: :string, desc: 'Sort by: path, mtime, size'
+    option :order, type: :string, desc: 'Sort order: asc, desc'
+    option :limit, type: :numeric, desc: 'Limit number of results'
+    option :offset, type: :numeric, desc: 'Offset for pagination'
+    # Options for read_file
+    # Options for put_file/delete_file
+    option :if_match_sha256, type: :string, desc: 'Only proceed if file matches SHA256 hash'
+    option :encoding, type: :string, desc: 'File encoding (default: UTF-8)'
+    # Options for search
+    option :pattern, type: :string, desc: 'Search pattern (regex)'
+    option :regex, type: :boolean, desc: 'Treat pattern as regex'
+    option :case_sensitive, type: :boolean, desc: 'Case-sensitive search'
+    option :before, type: :numeric, desc: 'Number of context lines before match'
+    option :after, type: :numeric, desc: 'Number of context lines after match'
+    # Options for move_file
+    option :to_path, type: :string, desc: 'Destination path for move operation'
+    option :overwrite, type: :boolean, desc: 'Overwrite existing files'
+    # Options for bundle
+    option :paths, type: :string, repeatable: true, desc: 'Paths to include in bundle (can be repeated)'
+    option :max_size, type: :numeric, desc: 'Maximum bundle size in bytes'
+    # Options for apply_diff
+    option :diff, type: :string, desc: 'Diff content to apply'
+    option :dry_run, type: :boolean, desc: 'Preview changes without applying'
+    def ops(operation = nil, *args)
+      Commands::Ops.new(operation, args, options).call
     end
 
     def self.exit_on_failure?
@@ -208,6 +247,7 @@ module Holocron
       shell.say '  holo buffer [ACTION]              Manage buffer file'
       shell.say '  holo notebook [ARGS]              Manage notebooks'
       shell.say '  holo suggest [MESSAGE]            Create framework suggestion'
+      shell.say '  holo ops [OPERATION]              Execute operations (list_files, read_file, etc.)'
     end
   end
 end

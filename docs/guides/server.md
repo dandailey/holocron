@@ -26,6 +26,20 @@ holo server start --port 3000 --host 0.0.0.0
 holo server start --background --port 8080
 ```
 
+### Selecting the HTTP adapter
+
+The server now runs as a Rack app. By default it uses WEBrick. You can choose Puma if available:
+
+```bash
+# Use Puma (if installed)
+holo server start --adapter puma
+
+# Explicitly use WEBrick
+holo server start --adapter webrick
+```
+
+If Puma is not available, the server falls back to WEBrick automatically.
+
 ### Stopping the Server
 
 ```bash
@@ -76,6 +90,7 @@ This stops the current server (if running) and starts a new one with the same co
 - **Port**: 4567
 - **PID File**: ~/.holocron_server.pid
 - **Log File**: ~/.holocron_server.log
+ - **Adapter**: webrick (puma optional)
 
 ### Custom Configuration
 All settings can be overridden with command-line options:

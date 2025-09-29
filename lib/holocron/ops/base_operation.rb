@@ -16,12 +16,13 @@ module Holocron
 
       def safe_file_path(relative_path)
         # Remove any path traversal attempts and ensure it's within holocron root
-        clean_path = relative_path.to_s.gsub(%r{\.\./}, '').gsub(%r{^/+}, '')
-        @path_resolver.resolve_path(clean_path)
+        clean_path = relative_path.to_s.gsub(%r{\.\./}, '').gsub(%r{^/+}, '').gsub(%r{^\./}, '')
+        resolved_path = @path_resolver.resolve_path(clean_path)
+        resolved_path
       end
 
       def sanitize_path(path)
-        # Similar to safe_file_path but for directories
+        # Simple sanitization for directory paths
         path.to_s.gsub(%r{\.\./}, '').gsub(%r{^/+}, '')
       end
 

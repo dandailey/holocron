@@ -6,7 +6,7 @@ module Holocron
   module Ops
     class ListFiles < BaseOperation
       def call(data)
-        dir = sanitize_path(data['dir'] || '.')
+        dir = sanitize_path(data['dir'] || 'files')
         include_globs = Array(data['include_glob'] || ['**/*'])
         exclude_globs = Array(data['exclude_glob'] || [])
         extensions = Array(data['extensions'] || [])
@@ -51,7 +51,7 @@ module Holocron
             files << {
               path: relative_path,
               size: stat.size,
-              mtime: stat.mtime.iso8601,
+              mtime: stat.mtime.strftime('%Y-%m-%dT%H:%M:%S%z'),
               ext: File.extname(relative_path)[1..-1] || ''
             }
           end

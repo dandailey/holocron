@@ -34,9 +34,9 @@ module Holocron
       return File.join(@holocron_path, logical_path) if @layout_version.nil?
 
       case @layout_version
-      when '0.2'
+      when /^0\.2/
         resolve_0_2_path(logical_path)
-      when '0.1'
+      when /^0\.1/
         resolve_0_1_path(logical_path)
       else
         File.join(@holocron_path, logical_path)
@@ -84,9 +84,13 @@ module Holocron
         File.join(@holocron_path, logical_path)
       when %r{^tmp/}
         File.join(@holocron_path, logical_path)
-      else
-        # Default to root level
+      when %r{^files/}
         File.join(@holocron_path, logical_path)
+      when 'files'
+        File.join(@holocron_path, 'files')
+      else
+        # Default to files/ directory for user content
+        File.join(@holocron_path, 'files', logical_path)
       end
     end
 
