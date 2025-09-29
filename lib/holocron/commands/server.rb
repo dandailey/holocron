@@ -70,7 +70,7 @@ module Holocron
         puts '📋 Available endpoints:'
         puts '   GET  /v1/holocrons                           - List all Holocrons'
         puts '   GET  /v1/{holo-name}/status                  - Get Holocron status'
-        puts '   GET  /v1/help                                - HTTP help (see docs/ops/index.md)'
+        puts '   GET  /v1/help                                - HTTP help (Accept: markdown/json)'
         puts ''
         puts '📋 Operations API:'
         puts '   GET/POST /v1/{holo-name}/ops/list_files     - List files with filters'

@@ -19,7 +19,22 @@ module Holocron
       path = req.path_info
 
       return ok_json(@registry.to_hash) if req.get? && path == '/v1/holocrons'
-      return ok_markdown(help_markdown(nil)) if req.get? && path == '/v1/help'
+
+      # Content negotiation for help
+      if req.get? && path == '/v1/help'
+        return ok_markdown(help_markdown(nil)) unless req.env['HTTP_ACCEPT']&.include?('application/json')
+
+        return ok_json({
+                         docs: {
+                           hub: 'docs/index.md',
+                           parity: 'docs/ops/index.md',
+                           guides: 'docs/guides/'
+                         },
+                         base_url: "http://#{@host}:#{@port}",
+                         api_version: 'v1'
+                       })
+
+      end
 
       # Match /v1/:holo/... endpoints
       parts = path.split('/').reject(&:empty?)

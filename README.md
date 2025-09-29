@@ -55,17 +55,7 @@ Holocron is like the VHS tape from "50 First Dates" - every session, you read it
 
 ## Documentation
 
-- **[Framework Guide](docs/framework/README.md)** - Complete Holocron framework documentation
-- **[Installation Guide](docs/installation.md)** - Detailed setup instructions
-- **[Commands Reference](docs/commands.md)** - Complete command documentation
-- **[Roadmap](docs/roadmap.md)** - Future features and development plans
-- **[Contributing](docs/contributing.md)** - How to contribute to the project
-
-### Guides
-
-- **[Refreshing Context](docs/guides/refreshing-context.md)** - How to create context refresh files
-- **[Creating Long Form Docs](docs/guides/creating-long-form-docs.md)** - Managing complex documentation
-- **[Server Management](docs/guides/server.md)** - Web server management and API usage
+See [docs/index.md](docs/index.md) for the complete documentation hub.
 
 ## Basic Usage
 
