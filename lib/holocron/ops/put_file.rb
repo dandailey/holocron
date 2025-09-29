@@ -17,6 +17,10 @@ module Holocron
         return error_response('Path parameter required', 400) unless path
         return error_response('Content parameter required', 400) unless content
 
+        # Validate path is not a system path
+        validation_error = validate_file_path(path)
+        return validation_error if validation_error
+
         file_path = safe_file_path(path)
 
         # Check precondition if specified

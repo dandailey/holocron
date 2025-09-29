@@ -88,6 +88,9 @@ module Holocron
 
         # Validate path is within holocron root
         raise PathError, "Path traversal detected: #{file_path}" unless path_safe?(full_path)
+        
+        # Validate path is not a system path
+        raise PathError, "Use resource ops or paths under files/." if system_path?(file_path)
 
         result = apply_file_change(full_path, file_change)
         results << result
@@ -114,6 +117,21 @@ module Holocron
     def path_safe?(full_path)
       normalized_path = File.expand_path(full_path)
       normalized_path.start_with?(@holocron_root) && !normalized_path.include?('..')
+    end
+
+    def system_path?(relative_path)
+      # Check if path is a system path that should be blocked
+      clean_path = relative_path.to_s.gsub(%r{\.\./}, '').gsub(%r{^/+}, '').gsub(%r{^\./}, '')
+      
+      # Block system files in root directory
+      return true if clean_path.match?(/^[^\/]+\.md$/) && !clean_path.start_with?('files/')
+      
+      # Block system directories
+      return true if clean_path.start_with?('_memory/') || clean_path.start_with?('decisions/') || 
+                    clean_path.start_with?('progress_logs/') || clean_path.start_with?('context_refresh/') ||
+                    clean_path.start_with?('knowledge_base/') || clean_path.start_with?('longform_docs/')
+      
+      false
     end
 
     def apply_file_change(full_path, file_change)

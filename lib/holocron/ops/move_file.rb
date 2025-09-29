@@ -16,6 +16,12 @@ module Holocron
         return error_response('From parameter required', 400) unless from
         return error_response('To parameter required', 400) unless to
 
+        # Validate paths are not system paths
+        validation_error = validate_file_path(from)
+        return validation_error if validation_error
+        validation_error = validate_file_path(to)
+        return validation_error if validation_error
+
         from_path = safe_file_path(from)
         to_path = safe_file_path(to)
 

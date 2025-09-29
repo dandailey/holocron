@@ -35,6 +35,26 @@ module Holocron
       def file_sha256(file_path)
         Digest::SHA256.hexdigest(File.read(file_path, encoding: 'UTF-8'))
       end
+
+      def system_path?(relative_path)
+        # Check if path is a system path that should be blocked
+        clean_path = relative_path.to_s.gsub(%r{\.\./}, '').gsub(%r{^/+}, '').gsub(%r{^\./}, '')
+        
+        # Block system files in root directory
+        return true if clean_path.match?(/^[^\/]+\.md$/) && !clean_path.start_with?('files/')
+        
+        # Block system directories
+        return true if clean_path.start_with?('_memory/') || clean_path.start_with?('decisions/') || 
+                      clean_path.start_with?('progress_logs/') || clean_path.start_with?('context_refresh/') ||
+                      clean_path.start_with?('knowledge_base/') || clean_path.start_with?('longform_docs/')
+        
+        false
+      end
+
+      def validate_file_path(relative_path)
+        return error_response('Use resource ops or paths under files/.', 403) if system_path?(relative_path)
+        nil
+      end
     end
   end
 end

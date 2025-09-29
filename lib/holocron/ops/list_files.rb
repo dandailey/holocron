@@ -16,6 +16,13 @@ module Holocron
         limit = data['limit']&.to_i
         offset = data['offset']&.to_i || 0
 
+        # For generic file operations, only allow access to files/ directory
+        if dir == '.' || dir == ''
+          dir = 'files'
+        elsif !dir.start_with?('files/')
+          return error_response('Use resource ops or paths under files/.', 403)
+        end
+
         base_path = @path_resolver.resolve_path(dir)
         return error_response('Directory not found', 404) unless Dir.exist?(base_path)
 
