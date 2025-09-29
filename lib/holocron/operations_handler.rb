@@ -12,6 +12,10 @@ require_relative 'ops/bundle_files'
 require_relative 'ops/apply_diff'
 require_relative 'ops/doc_get'
 require_relative 'ops/doc_update'
+require_relative 'ops/progress_add'
+require_relative 'ops/progress_list'
+require_relative 'ops/decision_add'
+require_relative 'ops/decision_list'
 
 module Holocron
   class OperationsHandler
@@ -60,6 +64,22 @@ module Holocron
         return error_response('PUT method required', 405) unless method == 'PUT'
 
         Ops::DocUpdate.new(@holocron_path).call(data)
+      when 'progress_add'
+        return error_response('POST method required', 405) unless method == 'POST'
+
+        Ops::ProgressAdd.new(@holocron_path).call(data)
+      when 'progress_list'
+        return error_response('GET method required', 405) unless method == 'GET'
+
+        Ops::ProgressList.new(@holocron_path).call(data)
+      when 'decision_add'
+        return error_response('POST method required', 405) unless method == 'POST'
+
+        Ops::DecisionAdd.new(@holocron_path).call(data)
+      when 'decision_list'
+        return error_response('GET method required', 405) unless method == 'GET'
+
+        Ops::DecisionList.new(@holocron_path).call(data)
       else
         error_response("Unknown operation: #{operation}", 404)
       end

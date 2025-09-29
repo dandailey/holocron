@@ -196,6 +196,12 @@ module Holocron
     # Options for apply_diff
     option :diff, type: :string, desc: 'Diff content to apply'
     option :dry_run, type: :boolean, desc: 'Preview changes without applying'
+    # Options for progress operations
+    option :summary, type: :string, desc: 'Summary for progress entry'
+    option :author, type: :string, desc: 'Author of the entry'
+    option :message, type: :string, desc: 'Commit message for the entry'
+    # Options for decision operations
+    option :title, type: :string, desc: 'Title for decision entry'
     def ops(operation = nil, *args)
       Commands::Ops.new(operation, args, options).call
     end

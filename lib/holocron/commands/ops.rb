@@ -54,7 +54,11 @@ module Holocron
           { name: 'bundle', desc: 'Bundle multiple files', method: 'POST' },
           { name: 'apply_diff', desc: 'Apply a diff to multiple files', method: 'POST' },
           { name: 'doc_get', desc: 'Get system document content', method: 'GET' },
-          { name: 'doc_update', desc: 'Update system document content', method: 'PUT' }
+          { name: 'doc_update', desc: 'Update system document content', method: 'PUT' },
+          { name: 'progress_add', desc: 'Add a progress log entry', method: 'POST' },
+          { name: 'progress_list', desc: 'List progress log entries with pagination', method: 'GET' },
+          { name: 'decision_add', desc: 'Add a decision log entry', method: 'POST' },
+          { name: 'decision_list', desc: 'List decision log entries with pagination', method: 'GET' }
         ]
 
         operations.each do |op|
@@ -72,7 +76,7 @@ module Holocron
 
       def valid_operation?(operation)
         %w[list_files read_file put_file delete_file search move_file bundle apply_diff doc_get
-           doc_update].include?(operation)
+           doc_update progress_add progress_list decision_add decision_list].include?(operation)
       end
 
       def execute_operation
@@ -146,6 +150,14 @@ module Holocron
           map_doc_get_params(data)
         when 'doc_update'
           map_doc_update_params(data)
+        when 'progress_add'
+          map_progress_add_params(data)
+        when 'progress_list'
+          map_progress_list_params(data)
+        when 'decision_add'
+          map_decision_add_params(data)
+        when 'decision_list'
+          map_decision_list_params(data)
         end
       end
 
@@ -216,6 +228,28 @@ module Holocron
         data['message'] = @options[:message] if @options[:message]
       end
 
+      def map_progress_add_params(data)
+        data['summary'] = @options[:summary] if @options[:summary]
+        data['author'] = @options[:author] if @options[:author]
+        data['message'] = @options[:message] if @options[:message]
+      end
+
+      def map_progress_list_params(data)
+        data['limit'] = @options[:limit] if @options[:limit]
+        data['offset'] = @options[:offset] if @options[:offset]
+      end
+
+      def map_decision_add_params(data)
+        data['title'] = @options[:title] if @options[:title]
+        data['author'] = @options[:author] if @options[:author]
+        data['message'] = @options[:message] if @options[:message]
+      end
+
+      def map_decision_list_params(data)
+        data['limit'] = @options[:limit] if @options[:limit]
+        data['offset'] = @options[:offset] if @options[:offset]
+      end
+
       def extract_repeated_flag(flag_name)
         # Extract values from repeated flags using Thor's repeatable option support
         option_key = flag_name.to_sym
@@ -234,7 +268,7 @@ module Holocron
           'PUT'
         when 'delete_file'
           'DELETE'
-        when 'search', 'move_file', 'bundle', 'apply_diff'
+        when 'search', 'move_file', 'bundle', 'apply_diff', 'progress_add', 'decision_add'
           'POST'
         else
           'GET'
@@ -259,6 +293,14 @@ module Holocron
           display_doc_get_result(result)
         when 'doc_update'
           display_doc_update_result(result)
+        when 'progress_add'
+          display_progress_add_result(result)
+        when 'progress_list'
+          display_progress_list_result(result)
+        when 'decision_add'
+          display_decision_add_result(result)
+        when 'decision_list'
+          display_decision_list_result(result)
         else
           puts JSON.pretty_generate(result)
         end
@@ -340,6 +382,56 @@ module Holocron
           puts "Created: #{result[:created] ? 'Yes' : 'No'}"
         elsif result[:error]
           puts "Error: #{result[:error]}".colorize(:red)
+        end
+      end
+
+      def display_progress_add_result(result)
+        if result[:sha256]
+          puts 'Progress entry added successfully.'.colorize(:green)
+          puts "Filename: #{result[:filename]}"
+          puts "Summary: #{result[:summary]}"
+          puts "SHA256: #{result[:sha256]}"
+          puts "Bytes written: #{result[:bytes_written]}"
+        elsif result[:error]
+          puts "Error: #{result[:error]}".colorize(:red)
+        end
+      end
+
+      def display_progress_list_result(result)
+        if result[:entries] && result[:entries].any?
+          puts "Progress entries (#{result[:total]} total):\n"
+          result[:entries].each do |entry|
+            puts "  #{entry[:timestamp]}: #{entry[:summary]}"
+            puts "    File: #{entry[:filename]} (#{entry[:size]} bytes)"
+          end
+          puts "\n... and #{result[:total] - result[:offset] - result[:limit]} more entries" if result[:has_more]
+        else
+          puts 'No progress entries found.'
+        end
+      end
+
+      def display_decision_add_result(result)
+        if result[:sha256]
+          puts 'Decision entry added successfully.'.colorize(:green)
+          puts "Filename: #{result[:filename]}"
+          puts "Title: #{result[:title]}"
+          puts "SHA256: #{result[:sha256]}"
+          puts "Bytes written: #{result[:bytes_written]}"
+        elsif result[:error]
+          puts "Error: #{result[:error]}".colorize(:red)
+        end
+      end
+
+      def display_decision_list_result(result)
+        if result[:entries] && result[:entries].any?
+          puts "Decision entries (#{result[:total]} total):\n"
+          result[:entries].each do |entry|
+            puts "  #{entry[:timestamp]}: #{entry[:title]}"
+            puts "    File: #{entry[:filename]} (#{entry[:size]} bytes)"
+          end
+          puts "\n... and #{result[:total] - result[:offset] - result[:limit]} more entries" if result[:has_more]
+        else
+          puts 'No decision entries found.'
         end
       end
     end
