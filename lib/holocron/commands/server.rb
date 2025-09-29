@@ -70,6 +70,7 @@ module Holocron
         puts '📋 Available endpoints:'
         puts '   GET  /v1/holocrons                           - List all Holocrons'
         puts '   GET  /v1/{holo-name}/status                  - Get Holocron status'
+        puts '   GET  /v1/help                                - HTTP help (see docs/ops/index.md)'
         puts ''
         puts '📋 Operations API:'
         puts '   GET/POST /v1/{holo-name}/ops/list_files     - List files with filters'
@@ -445,6 +446,9 @@ module Holocron
           - All paths are sandboxed within the Holocron root; traversal outside is prevented.
           - Precondition writes via `if_match_sha256` prevent accidental overwrites.
 
+          ## Parity & Conventions
+          - See `docs/ops/index.md` for the CLI/HTTP parity matrix and shared filter conventions.
+
           ## Full Design Doc
           See `web_service_plan.md` in `.holocron/sync/` of the project repository for the complete specification.
         MD
@@ -501,7 +505,7 @@ module Holocron
 
       def not_found(res)
         res.status = 404
-        res.body = JSON.generate({ error: 'Not Found' })
+        res.body = JSON.generate({ error: 'Not Found', status: 404 })
       end
     end
   end

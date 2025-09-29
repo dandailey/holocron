@@ -6,7 +6,7 @@ module Holocron
   module Ops
     class ListFiles < BaseOperation
       def call(data)
-        dir = sanitize_path(data['dir'] || 'files')
+        dir = sanitize_path(data['dir'] || '.')
         include_globs = Array(data['include_glob'] || ['**/*'])
         exclude_globs = Array(data['exclude_glob'] || [])
         extensions = Array(data['extensions'] || [])
