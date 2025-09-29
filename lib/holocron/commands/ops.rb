@@ -52,7 +52,9 @@ module Holocron
           { name: 'search', desc: 'Search content across files', method: 'POST' },
           { name: 'move_file', desc: 'Move or rename a file', method: 'POST' },
           { name: 'bundle', desc: 'Bundle multiple files', method: 'POST' },
-          { name: 'apply_diff', desc: 'Apply a diff to multiple files', method: 'POST' }
+          { name: 'apply_diff', desc: 'Apply a diff to multiple files', method: 'POST' },
+          { name: 'doc_get', desc: 'Get system document content', method: 'GET' },
+          { name: 'doc_update', desc: 'Update system document content', method: 'PUT' }
         ]
 
         operations.each do |op|
@@ -69,7 +71,8 @@ module Holocron
       end
 
       def valid_operation?(operation)
-        %w[list_files read_file put_file delete_file search move_file bundle apply_diff].include?(operation)
+        %w[list_files read_file put_file delete_file search move_file bundle apply_diff doc_get
+           doc_update].include?(operation)
       end
 
       def execute_operation
@@ -139,6 +142,10 @@ module Holocron
           map_bundle_params(data)
         when 'apply_diff'
           map_apply_diff_params(data)
+        when 'doc_get'
+          map_doc_get_params(data)
+        when 'doc_update'
+          map_doc_update_params(data)
         end
       end
 
@@ -199,6 +206,16 @@ module Holocron
         data['dry_run'] = @options[:dry_run] if @options[:dry_run]
       end
 
+      def map_doc_get_params(data)
+        data['name'] = @args[0] if @args[0] && !@args[0].start_with?('--')
+      end
+
+      def map_doc_update_params(data)
+        data['name'] = @args[0] if @args[0] && !@args[0].start_with?('--')
+        data['author'] = @options[:author] if @options[:author]
+        data['message'] = @options[:message] if @options[:message]
+      end
+
       def extract_repeated_flag(flag_name)
         # Extract values from repeated flags using Thor's repeatable option support
         option_key = flag_name.to_sym
@@ -213,7 +230,7 @@ module Holocron
 
       def determine_http_method(operation)
         case operation
-        when 'put_file'
+        when 'put_file', 'doc_update'
           'PUT'
         when 'delete_file'
           'DELETE'
@@ -238,6 +255,10 @@ module Holocron
           display_bundle_result(result)
         when 'apply_diff'
           display_apply_diff_result(result)
+        when 'doc_get'
+          display_doc_get_result(result)
+        when 'doc_update'
+          display_doc_update_result(result)
         else
           puts JSON.pretty_generate(result)
         end
@@ -298,6 +319,25 @@ module Holocron
         if result[:success]
           puts 'Diff applied successfully.'.colorize(:green)
           puts "Files modified: #{result[:files_modified]}" if result[:files_modified]
+        elsif result[:error]
+          puts "Error: #{result[:error]}".colorize(:red)
+        end
+      end
+
+      def display_doc_get_result(result)
+        if result[:content]
+          puts result[:content]
+        elsif result[:error]
+          puts "Error: #{result[:error]}".colorize(:red)
+        end
+      end
+
+      def display_doc_update_result(result)
+        if result[:sha256]
+          puts 'Document updated successfully.'.colorize(:green)
+          puts "SHA256: #{result[:sha256]}"
+          puts "Bytes written: #{result[:bytes_written]}"
+          puts "Created: #{result[:created] ? 'Yes' : 'No'}"
         elsif result[:error]
           puts "Error: #{result[:error]}".colorize(:red)
         end

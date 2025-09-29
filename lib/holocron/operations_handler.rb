@@ -10,6 +10,8 @@ require_relative 'ops/search'
 require_relative 'ops/move_file'
 require_relative 'ops/bundle_files'
 require_relative 'ops/apply_diff'
+require_relative 'ops/doc_get'
+require_relative 'ops/doc_update'
 
 module Holocron
   class OperationsHandler
@@ -50,6 +52,14 @@ module Holocron
         return error_response('POST method required', 405) unless method == 'POST'
 
         Ops::ApplyDiff.new(@holocron_path).call(data)
+      when 'doc_get'
+        return error_response('GET method required', 405) unless method == 'GET'
+
+        Ops::DocGet.new(@holocron_path).call(data)
+      when 'doc_update'
+        return error_response('PUT method required', 405) unless method == 'PUT'
+
+        Ops::DocUpdate.new(@holocron_path).call(data)
       else
         error_response("Unknown operation: #{operation}", 404)
       end
