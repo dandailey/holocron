@@ -16,6 +16,9 @@ require_relative 'ops/progress_add'
 require_relative 'ops/progress_list'
 require_relative 'ops/decision_add'
 require_relative 'ops/decision_list'
+require_relative 'ops/refresh_create'
+require_relative 'ops/refresh_list'
+require_relative 'ops/refresh_consume'
 
 module Holocron
   class OperationsHandler
@@ -80,6 +83,18 @@ module Holocron
         return error_response('GET method required', 405) unless method == 'GET'
 
         Ops::DecisionList.new(@holocron_path).call(data)
+      when 'refresh_create'
+        return error_response('POST method required', 405) unless method == 'POST'
+
+        Ops::RefreshCreate.new(@holocron_path).call(data)
+      when 'refresh_list'
+        return error_response('GET method required', 405) unless method == 'GET'
+
+        Ops::RefreshList.new(@holocron_path).call(data)
+      when 'refresh_consume'
+        return error_response('POST method required', 405) unless method == 'POST'
+
+        Ops::RefreshConsume.new(@holocron_path).call(data)
       else
         error_response("Unknown operation: #{operation}", 404)
       end

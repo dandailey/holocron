@@ -58,7 +58,10 @@ module Holocron
           { name: 'progress_add', desc: 'Add a progress log entry', method: 'POST' },
           { name: 'progress_list', desc: 'List progress log entries with pagination', method: 'GET' },
           { name: 'decision_add', desc: 'Add a decision log entry', method: 'POST' },
-          { name: 'decision_list', desc: 'List decision log entries with pagination', method: 'GET' }
+          { name: 'decision_list', desc: 'List decision log entries with pagination', method: 'GET' },
+          { name: 'refresh_create', desc: 'Create a context refresh file', method: 'POST' },
+          { name: 'refresh_list', desc: 'List context refresh files with pagination', method: 'GET' },
+          { name: 'refresh_consume', desc: 'Consume a pending context refresh', method: 'POST' }
         ]
 
         operations.each do |op|
@@ -76,7 +79,8 @@ module Holocron
 
       def valid_operation?(operation)
         %w[list_files read_file put_file delete_file search move_file bundle apply_diff doc_get
-           doc_update progress_add progress_list decision_add decision_list].include?(operation)
+           doc_update progress_add progress_list decision_add decision_list refresh_create
+           refresh_list refresh_consume].include?(operation)
       end
 
       def execute_operation
@@ -158,6 +162,12 @@ module Holocron
           map_decision_add_params(data)
         when 'decision_list'
           map_decision_list_params(data)
+        when 'refresh_create'
+          map_refresh_create_params(data)
+        when 'refresh_list'
+          map_refresh_list_params(data)
+        when 'refresh_consume'
+          map_refresh_consume_params(data)
         end
       end
 
@@ -250,6 +260,21 @@ module Holocron
         data['offset'] = @options[:offset] if @options[:offset]
       end
 
+      def map_refresh_create_params(data)
+        data['name'] = @args[0] if @args[0] && !@args[0].start_with?('--')
+        data['author'] = @options[:author] if @options[:author]
+        data['message'] = @options[:message] if @options[:message]
+      end
+
+      def map_refresh_list_params(data)
+        data['limit'] = @options[:limit] if @options[:limit]
+        data['offset'] = @options[:offset] if @options[:offset]
+      end
+
+      def map_refresh_consume_params(data)
+        data['id'] = @args[0] if @args[0] && !@args[0].start_with?('--')
+      end
+
       def extract_repeated_flag(flag_name)
         # Extract values from repeated flags using Thor's repeatable option support
         option_key = flag_name.to_sym
@@ -268,7 +293,7 @@ module Holocron
           'PUT'
         when 'delete_file'
           'DELETE'
-        when 'search', 'move_file', 'bundle', 'apply_diff', 'progress_add', 'decision_add'
+        when 'search', 'move_file', 'bundle', 'apply_diff', 'progress_add', 'decision_add', 'refresh_create', 'refresh_consume'
           'POST'
         else
           'GET'
@@ -301,6 +326,12 @@ module Holocron
           display_decision_add_result(result)
         when 'decision_list'
           display_decision_list_result(result)
+        when 'refresh_create'
+          display_refresh_create_result(result)
+        when 'refresh_list'
+          display_refresh_list_result(result)
+        when 'refresh_consume'
+          display_refresh_consume_result(result)
         else
           puts JSON.pretty_generate(result)
         end
@@ -432,6 +463,46 @@ module Holocron
           puts "\n... and #{result[:total] - result[:offset] - result[:limit]} more entries" if result[:has_more]
         else
           puts 'No decision entries found.'
+        end
+      end
+
+      def display_refresh_create_result(result)
+        if result[:sha256]
+          puts 'Context refresh created successfully.'.colorize(:green)
+          puts "Filename: #{result[:filename]}"
+          puts "Name: #{result[:name]}"
+          puts "Status: #{result[:status]}"
+          puts "SHA256: #{result[:sha256]}"
+          puts "Bytes written: #{result[:bytes_written]}"
+        elsif result[:error]
+          puts "Error: #{result[:error]}".colorize(:red)
+        end
+      end
+
+      def display_refresh_list_result(result)
+        if result[:refreshes] && result[:refreshes].any?
+          puts "Context refreshes (#{result[:total]} total):\n"
+          result[:refreshes].each do |refresh|
+            status_color = refresh[:status] == 'pending' ? :yellow : :green
+            puts "  #{refresh[:display_name]} (#{refresh[:status].colorize(status_color)})"
+            puts "    Created: #{refresh[:created_at]} (#{refresh[:size]} bytes)"
+          end
+          puts "\n... and #{result[:total] - result[:offset] - result[:limit]} more refreshes" if result[:has_more]
+        else
+          puts 'No context refreshes found.'
+        end
+      end
+
+      def display_refresh_consume_result(result)
+        if result[:sha256]
+          puts 'Context refresh consumed successfully.'.colorize(:green)
+          puts "Original filename: #{result[:original_filename]}"
+          puts "New filename: #{result[:filename]}"
+          puts "Status: #{result[:status]}"
+          puts "Consumed at: #{result[:consumed_at]}"
+          puts "SHA256: #{result[:sha256]}"
+        elsif result[:error]
+          puts "Error: #{result[:error]}".colorize(:red)
         end
       end
     end
