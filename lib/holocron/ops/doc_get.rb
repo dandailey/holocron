@@ -5,24 +5,11 @@ require_relative 'base_operation'
 module Holocron
   module Ops
     class DocGet < BaseOperation
-      # Whitelist of allowed system documents
-      ALLOWED_DOCS = %w[
-        vision
-        roadmap
-        project_overview
-        commands
-        action_plan
-        decision_log
-        env_setup
-        progress_log
-        test_list
-      ].freeze
-
       def call(data)
         name = data['name']
         return error_response('Name parameter required', 400) unless name
 
-        return error_response("Document '#{name}' not found", 404) unless ALLOWED_DOCS.include?(name)
+        return error_response("Document '#{name}' not found", 404) unless ALLOWED_SYSTEM_DOCS.include?(name)
 
         # Map document names to actual file paths
         file_path = resolve_doc_path(name)

@@ -7,6 +7,19 @@ require_relative '../path_resolver'
 module Holocron
   module Ops
     class BaseOperation
+      # Whitelist of allowed system documents
+      ALLOWED_SYSTEM_DOCS = %w[
+        vision
+        roadmap
+        project_overview
+        commands
+        action_plan
+        decision_log
+        env_setup
+        progress_log
+        test_list
+      ].freeze
+
       def initialize(holocron_path)
         @holocron_path = File.expand_path(holocron_path)
         @path_resolver = PathResolver.new(holocron_path)
@@ -39,20 +52,21 @@ module Holocron
       def system_path?(relative_path)
         # Check if path is a system path that should be blocked
         clean_path = relative_path.to_s.gsub(%r{\.\./}, '').gsub(%r{^/+}, '').gsub(%r{^\./}, '')
-        
+
         # Block system files in root directory
-        return true if clean_path.match?(/^[^\/]+\.md$/) && !clean_path.start_with?('files/')
-        
+        return true if clean_path.match?(%r{^[^/]+\.md$}) && !clean_path.start_with?('files/')
+
         # Block system directories
-        return true if clean_path.start_with?('_memory/') || clean_path.start_with?('decisions/') || 
-                      clean_path.start_with?('progress_logs/') || clean_path.start_with?('context_refresh/') ||
-                      clean_path.start_with?('knowledge_base/') || clean_path.start_with?('longform_docs/')
-        
+        return true if clean_path.start_with?('_memory/') || clean_path.start_with?('decisions/') ||
+                       clean_path.start_with?('progress_logs/') || clean_path.start_with?('context_refresh/') ||
+                       clean_path.start_with?('knowledge_base/') || clean_path.start_with?('longform_docs/')
+
         false
       end
 
       def validate_file_path(relative_path)
         return error_response('Use resource ops or paths under files/.', 403) if system_path?(relative_path)
+
         nil
       end
     end

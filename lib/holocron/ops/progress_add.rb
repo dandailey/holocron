@@ -52,12 +52,13 @@ module Holocron
         # Use summary if available, otherwise use first line of content
         base_text = summary || content.lines.first&.strip || 'progress_update'
 
-        # Convert to slug: lowercase, replace spaces/special chars with hyphens
+        # Convert to slug: lowercase, replace spaces/special chars with underscores
         base_text.downcase
-                 .gsub(/[^a-z0-9\s-]/, '')
-                 .gsub(/\s+/, '-')
-                 .gsub(/-+/, '-')
-                 .gsub(/^-|-$/, '')
+                 .gsub(/[^a-z0-9\s_-]/, '')
+                 .gsub(/\s+/, '_')
+                 .gsub(/-+/, '_')
+                 .gsub(/_+/, '_')
+                 .gsub(/^_|_$/, '')
                  .slice(0, 50) # Limit length
       end
 
