@@ -5,7 +5,7 @@ require 'pathname'
 module Holocron
   class DocumentationLoader
     def self.framework_guide
-      prepend_date_header(load_documentation('framework/README.md'))
+      prepend_date_header(load_documentation('framework.md'))
     end
 
     def self.refreshing_context_guide

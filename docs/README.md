@@ -4,12 +4,22 @@ Welcome to the comprehensive documentation for Holocron, the persistent memory f
 
 ## Table of Contents
 
-- **[Installation Guide](installation.md)** - Get Holocron up and running on your system
+### Core Reference
+- **[Framework](framework.md)** - The Holocron framework guide (AI onboarding)
+- **[Architecture](architecture.md)** - Technical details and design decisions
 - **[Commands Reference](commands.md)** - Complete documentation for all CLI commands
+
+### Getting Started
+- **[Installation Guide](installation.md)** - Get Holocron up and running on your system
+- **[Troubleshooting](troubleshooting.md)** - Common issues and solutions
+
+### Project Meta
 - **[Roadmap](roadmap.md)** - Future features and development timeline
 - **[Contributing](contributing.md)** - How to contribute to the project
-- **[Architecture](architecture.md)** - Technical details and design decisions
-- **[Troubleshooting](troubleshooting.md)** - Common issues and solutions
+
+### Guides & Operations
+- **[Guides](guides/)** - Task-specific how-tos (server, progress logging, etc.)
+- **[Operations](ops/index.md)** - API operations parity matrix and specs
 
 ## Quick Navigation
 
